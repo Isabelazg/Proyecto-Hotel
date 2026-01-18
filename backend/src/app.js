@@ -1,4 +1,5 @@
 import express from "express";
+import routes from "./routes/index.route.js";
 
 const app = express();
 
@@ -20,6 +21,9 @@ app.use((req, res, next) => {
 });
 
 const API_VERSION = "/api/v1";
+
+// Rutas de la API
+app.use(API_VERSION, routes);
 
 app.get(`${API_VERSION}/health`, (req, res) => {
 	res.status(200).json({ status: "ok" });
