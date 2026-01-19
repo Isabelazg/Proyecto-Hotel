@@ -4,6 +4,7 @@ import Rol from './rol.model.js';
 import Permiso from './permiso.model.js';
 import TipoHospedaje from './tipoHospedaje.model.js';
 import Hospedaje from './hospedaje.model.js';
+import Reserva from './reserva.model.js';
 
 // Relación Usuario -> Rol (belongsTo)
 Usuario.belongsTo(Rol, {
@@ -44,4 +45,16 @@ TipoHospedaje.hasMany(Hospedaje, {
   as: 'hospedajes',
 });
 
-export { sequelize, Usuario, Rol, Permiso, TipoHospedaje, Hospedaje };
+// Relación Reserva -> Hospedaje (belongsTo)
+Reserva.belongsTo(Hospedaje, {
+  foreignKey: 'hospedaje_id',
+  as: 'hospedaje',
+});
+
+// Relación Hospedaje -> Reserva (hasMany)
+Hospedaje.hasMany(Reserva, {
+  foreignKey: 'hospedaje_id',
+  as: 'reservas',
+});
+
+export { sequelize, Usuario, Rol, Permiso, TipoHospedaje, Hospedaje, Reserva };
