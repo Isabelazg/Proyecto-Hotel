@@ -1,8 +1,8 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.config.js';
 
-const Rol = sequelize.define(
-  'Rol',
+const Permiso = sequelize.define(
+  'Permiso',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -21,9 +21,9 @@ const Rol = sequelize.define(
     },
   },
   {
-    tableName: 'roles',
+    tableName: 'permisos',
     timestamps: false,
   }
 );
 
-export default Rol;
+export default Permiso;
