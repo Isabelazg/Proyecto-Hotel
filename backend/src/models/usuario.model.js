@@ -24,7 +24,7 @@ const Usuario = sequelize.define(
       allowNull: true,
     },
     telefono: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       allowNull: true,
     },
     rol_id: {
@@ -40,10 +40,34 @@ const Usuario = sequelize.define(
       type: DataTypes.STRING(100),
       allowNull: true,
     },
+    contrasena: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    reset_token: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    reset_token_expires: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     tableName: 'usuarios',
     timestamps: false,
+    hooks: {
+      beforeCreate: async (usuario) => {
+        if (usuario.contrasena) {
+          usuario.contrasena = await bcrypt.hash(usuario.contrasena, 10);
+        }
+      },
+      beforeUpdate: async (usuario) => {
+        if (usuario.changed('contrasena') && usuario.contrasena) {
+          usuario.contrasena = await bcrypt.hash(usuario.contrasena, 10);
+        }
+      },
+    },
   }
 );
 
