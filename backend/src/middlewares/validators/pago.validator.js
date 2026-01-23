@@ -1,6 +1,7 @@
 import { body } from 'express-validator';
 import { Reserva, Usuario } from '../../models/index.js';
 
+
 export const createPagoValidator = [
   body('reserva_id')
     .notEmpty().withMessage('El reserva_id es requerido.')
