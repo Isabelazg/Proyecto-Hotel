@@ -174,6 +174,11 @@ export const showReservaService = async (id) => {
 
 export const createReservaService = async (data) => {
   try {
+    // Validar datos requeridos
+    if (!data.hospedaje_id) {
+      throw new Error('El hospedaje_id es requerido');
+    }
+
     // Generar número de reserva si no se proporciona
     const numeroReserva = data.numero_reserva || await generarNumeroReserva();
 
@@ -197,6 +202,11 @@ export const createReservaService = async (data) => {
       fecha_ingreso_hora: data.fecha_ingreso_hora || null,
       fecha_salida_hora: data.fecha_salida_hora || null,
       numero_huespedes: data.numero_huespedes || null,
+      nombre_huesped: data.nombre_huesped || null,
+      apellido_huesped: data.apellido_huesped || null,
+      documento_huesped: data.documento_huesped || null,
+      telefono_huesped: data.telefono_huesped || null,
+      email_huesped: data.email_huesped || null,
       notas: data.notas || null,
       valor: data.valor || null,
     });
@@ -294,6 +304,11 @@ export const updateReservaService = async (id, data) => {
       fecha_ingreso_hora: data.fecha_ingreso_hora !== undefined ? data.fecha_ingreso_hora : reserva.fecha_ingreso_hora,
       fecha_salida_hora: data.fecha_salida_hora !== undefined ? data.fecha_salida_hora : reserva.fecha_salida_hora,
       numero_huespedes: data.numero_huespedes !== undefined ? data.numero_huespedes : reserva.numero_huespedes,
+      nombre_huesped: data.nombre_huesped !== undefined ? data.nombre_huesped : reserva.nombre_huesped,
+      apellido_huesped: data.apellido_huesped !== undefined ? data.apellido_huesped : reserva.apellido_huesped,
+      documento_huesped: data.documento_huesped !== undefined ? data.documento_huesped : reserva.documento_huesped,
+      telefono_huesped: data.telefono_huesped !== undefined ? data.telefono_huesped : reserva.telefono_huesped,
+      email_huesped: data.email_huesped !== undefined ? data.email_huesped : reserva.email_huesped,
       notas: data.notas !== undefined ? data.notas : reserva.notas,
       valor: data.valor !== undefined ? data.valor : reserva.valor,
     });

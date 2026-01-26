@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1'
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -25,10 +27,21 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Solo redirigir al login si:
+    // 1. Es un error 401
+    // 2. NO es la ruta de login
+    // 3. Ya hay un token guardado (usuario ya estaba autenticado)
+    if (
+      error.response?.status === 401 && 
+      !error.config.url.includes('/auth/login') &&
+      localStorage.getItem('token')
+    ) {
       localStorage.removeItem('token')
+      localStorage.removeItem('user')
       window.location.href = '/login'
     }
     return Promise.reject(error)
   }
 )
+
+export default api

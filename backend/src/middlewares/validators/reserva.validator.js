@@ -40,10 +40,31 @@ export const createReservaValidator = [
   body('numero_huespedes')
     .optional()
     .isInt({ min: 1 }).withMessage('El número de huéspedes debe ser un número entero mayor a 0.'),
+  body('nombre_huesped')
+    .optional()
+    .trim()
+    .isLength({ max: 100 }).withMessage('El nombre del huésped debe tener máximo 100 caracteres.'),
+  body('apellido_huesped')
+    .optional()
+    .trim()
+    .isLength({ max: 100 }).withMessage('El apellido del huésped debe tener máximo 100 caracteres.'),
+  body('documento_huesped')
+    .optional()
+    .trim()
+    .isLength({ max: 50 }).withMessage('El documento del huésped debe tener máximo 50 caracteres.'),
+  body('telefono_huesped')
+    .optional()
+    .trim()
+    .isLength({ max: 50 }).withMessage('El teléfono del huésped debe tener máximo 50 caracteres.'),
+  body('email_huesped')
+    .optional()
+    .trim()
+    .isEmail().withMessage('El email del huésped debe ser válido.')
+    .isLength({ max: 100 }).withMessage('El email del huésped debe tener máximo 100 caracteres.'),
   body('notas')
     .optional()
     .trim()
-    .isLength({ max: 50 }).withMessage('Las notas deben tener máximo 50 caracteres.'),
+    .isLength({ max: 255 }).withMessage('Las notas deben tener máximo 255 caracteres.'),
   body('valor')
     .optional()
     .isDecimal({ decimal_digits: '0,2' }).withMessage('El valor debe ser un número decimal válido (máximo 2 decimales).')
@@ -100,10 +121,31 @@ export const updateReservaValidator = [
   body('numero_huespedes')
     .optional()
     .isInt({ min: 1 }).withMessage('El número de huéspedes debe ser un número entero mayor a 0.'),
+  body('nombre_huesped')
+    .optional()
+    .trim()
+    .isLength({ max: 100 }).withMessage('El nombre del huésped debe tener máximo 100 caracteres.'),
+  body('apellido_huesped')
+    .optional()
+    .trim()
+    .isLength({ max: 100 }).withMessage('El apellido del huésped debe tener máximo 100 caracteres.'),
+  body('documento_huesped')
+    .optional()
+    .trim()
+    .isLength({ max: 50 }).withMessage('El documento del huésped debe tener máximo 50 caracteres.'),
+  body('telefono_huesped')
+    .optional()
+    .trim()
+    .isLength({ max: 50 }).withMessage('El teléfono del huésped debe tener máximo 50 caracteres.'),
+  body('email_huesped')
+    .optional()
+    .trim()
+    .isEmail().withMessage('El email del huésped debe ser válido.')
+    .isLength({ max: 100 }).withMessage('El email del huésped debe tener máximo 100 caracteres.'),
   body('notas')
     .optional()
     .trim()
-    .isLength({ max: 50 }).withMessage('Las notas deben tener máximo 50 caracteres.'),
+    .isLength({ max: 255 }).withMessage('Las notas deben tener máximo 255 caracteres.'),
   body('valor')
     .optional()
     .isDecimal({ decimal_digits: '0,2' }).withMessage('El valor debe ser un número decimal válido (máximo 2 decimales).')

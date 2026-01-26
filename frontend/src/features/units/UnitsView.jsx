@@ -3,37 +3,26 @@ import { Plus, Edit2, Trash2, Search, Filter } from 'lucide-react'
 import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
 import { UnitDialog } from './components/UnitDialog'
-
-const MOCK_UNITS = [
-  { id: 1, number: '101', type: 'Habitación Estándar', capacity: 2, status: 'disponible', floor: 1, price: 150 },
-  { id: 2, number: '102', type: 'Habitación Estándar', capacity: 2, status: 'ocupada', floor: 1, price: 150 },
-  { id: 3, number: '103', type: 'Habitación Ejecutiva', capacity: 3, status: 'disponible', floor: 1, price: 250 },
-  { id: 4, number: '201', type: 'Suite Deluxe', capacity: 4, status: 'mantenimiento', floor: 2, price: 400 },
-  { id: 5, number: '202', type: 'Suite Deluxe', capacity: 4, status: 'disponible', floor: 2, price: 400 },
-  { id: 6, number: '301', type: 'Suite Presidencial', capacity: 6, status: 'reservada', floor: 3, price: 800 },
-  { id: 7, number: '104', type: 'Habitación Estándar', capacity: 2, status: 'disponible', floor: 1, price: 150 },
-  { id: 8, number: '203', type: 'Habitación Ejecutiva', capacity: 3, status: 'limpieza', floor: 2, price: 250 },
-]
+import { useUnits } from './hooks/useUnits'
 
 const STATUS_CONFIG = {
   disponible: { label: 'Disponible', color: 'bg-green-100 text-green-800 border-green-200' },
-  ocupada: { label: 'Ocupada', color: 'bg-red-100 text-red-800 border-red-200' },
-  reservada: { label: 'Reservada', color: 'bg-orange-100 text-orange-800 border-orange-200' },
+  ocupado: { label: 'Ocupado', color: 'bg-red-100 text-red-800 border-red-200' },
   mantenimiento: { label: 'Mantenimiento', color: 'bg-gray-100 text-gray-800 border-gray-200' },
-  limpieza: { label: 'Limpieza', color: 'bg-blue-100 text-blue-800 border-blue-200' },
 }
 
 export function UnitsView() {
-  const [units, setUnits] = useState(MOCK_UNITS)
+  const { units, isLoading, error, create, update, remove, refetch } = useUnits()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState(null)
+  const [deleteConfirm, setDeleteConfirm] = useState({ show: false, unitId: null, unitName: '' })
 
   const filteredUnits = units.filter(unit => {
-    const matchesSearch = unit.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         unit.type.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === 'all' || unit.status === filterStatus
+    const matchesSearch = unit.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         unit.tipo_hospedaje?.nombre?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = filterStatus === 'all' || unit.estado === filterStatus
     return matchesSearch && matchesStatus
   })
 
@@ -47,20 +36,63 @@ export function UnitsView() {
     setDialogOpen(true)
   }
 
-  const handleSaveUnit = (unitData) => {
-    if (selectedUnit) {
-      setUnits(units.map(u => u.id === selectedUnit.id ? unitData : u))
-    } else {
-      setUnits([...units, unitData])
+  const handleSaveUnit = async (unitData) => {
+    try {
+      if (selectedUnit) {
+        await update(selectedUnit.id, unitData)
+      } else {
+        await create(unitData)
+      }
+      setDialogOpen(false)
+      setSelectedUnit(null)
+    } catch (err) {
+      console.error('Error saving unit:', err)
+      alert(err.message || 'Error al guardar la unidad')
     }
-    setDialogOpen(false)
-    setSelectedUnit(null)
   }
 
-  const handleDeleteUnit = (id) => {
-    setUnits(units.filter(u => u.id !== id))
-    setDialogOpen(false)
-    setSelectedUnit(null)
+  const handleDeleteUnit = async () => {
+    try {
+      await remove(deleteConfirm.unitId)
+      setDeleteConfirm({ show: false, unitId: null, unitName: '' })
+      setDialogOpen(false)
+      setSelectedUnit(null)
+    } catch (err) {
+      console.error('Error deleting unit:', err)
+      alert(err.message || 'Error al eliminar la unidad')
+      setDeleteConfirm({ show: false, unitId: null, unitName: '' })
+    }
+  }
+
+  const confirmDelete = (unit) => {
+    setDeleteConfirm({ show: true, unitId: unit.id, unitName: unit.nombre })
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando unidades...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-red-600">Error: {error}</p>
+          <button
+            onClick={refetch}
+            className="mt-4 px-4 py-2 bg-amber-900 text-white rounded-lg hover:bg-amber-800"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -81,7 +113,7 @@ export function UnitsView() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-xl border border-stone-200">
           <p className="text-sm text-stone-600">Total Unidades</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">{units.length}</p>
@@ -89,25 +121,19 @@ export function UnitsView() {
         <div className="bg-green-50 p-4 rounded-xl border border-green-200">
           <p className="text-sm text-green-800">Disponibles</p>
           <p className="text-2xl font-bold text-green-900 mt-1">
-            {units.filter(u => u.status === 'disponible').length}
+            {units.filter(u => u.estado === 'disponible').length}
           </p>
         </div>
         <div className="bg-red-50 p-4 rounded-xl border border-red-200">
           <p className="text-sm text-red-800">Ocupadas</p>
           <p className="text-2xl font-bold text-red-900 mt-1">
-            {units.filter(u => u.status === 'ocupada').length}
-          </p>
-        </div>
-        <div className="bg-orange-50 p-4 rounded-xl border border-orange-200">
-          <p className="text-sm text-orange-800">Reservadas</p>
-          <p className="text-2xl font-bold text-orange-900 mt-1">
-            {units.filter(u => u.status === 'reservada').length}
+            {units.filter(u => u.estado === 'ocupado').length}
           </p>
         </div>
         <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
           <p className="text-sm text-blue-800">Mantenimiento</p>
           <p className="text-2xl font-bold text-blue-900 mt-1">
-            {units.filter(u => u.status === 'mantenimiento' || u.status === 'limpieza').length}
+            {units.filter(u => u.estado === 'mantenimiento').length}
           </p>
         </div>
       </div>
@@ -119,7 +145,7 @@ export function UnitsView() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
             <Input
               type="text"
-              placeholder="Buscar por número o tipo de habitación..."
+              placeholder="Buscar por nombre o tipo..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 h-11"
@@ -134,10 +160,8 @@ export function UnitsView() {
             >
               <option value="all">Todos los estados</option>
               <option value="disponible">Disponible</option>
-              <option value="ocupada">Ocupada</option>
-              <option value="reservada">Reservada</option>
+              <option value="ocupado">Ocupado</option>
               <option value="mantenimiento">Mantenimiento</option>
-              <option value="limpieza">Limpieza</option>
             </select>
           </div>
         </div>
@@ -149,9 +173,8 @@ export function UnitsView() {
           <table className="w-full">
             <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Número</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Nombre</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Tipo</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Piso</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Capacidad</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Precio/Noche</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Estado</th>
@@ -161,7 +184,7 @@ export function UnitsView() {
             <tbody className="divide-y divide-stone-200">
               {filteredUnits.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-12 text-center text-stone-500">
+                  <td colSpan="6" className="px-6 py-12 text-center text-stone-500">
                     No se encontraron unidades
                   </td>
                 </tr>
@@ -169,17 +192,18 @@ export function UnitsView() {
                 filteredUnits.map(unit => (
                   <tr key={unit.id} className="hover:bg-stone-50 transition-colors">
                     <td className="px-6 py-4">
-                      <span className="font-semibold text-gray-900">{unit.number}</span>
+                      <span className="font-semibold text-gray-900">{unit.nombre}</span>
                     </td>
-                    <td className="px-6 py-4 text-stone-700">{unit.type}</td>
-                    <td className="px-6 py-4 text-stone-700">{unit.floor}</td>
-                    <td className="px-6 py-4 text-stone-700">{unit.capacity} personas</td>
+                    <td className="px-6 py-4 text-stone-700">
+                      {unit.tipo_hospedaje?.nombre || 'Sin tipo'}
+                    </td>
+                    <td className="px-6 py-4 text-stone-700">{unit.capacidad} personas</td>
                     <td className="px-6 py-4">
-                      <span className="font-semibold text-gray-900">${unit.price}</span>
+                      <span className="font-semibold text-gray-900">${unit.precio}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full border ${STATUS_CONFIG[unit.status].color}`}>
-                        {STATUS_CONFIG[unit.status].label}
+                      <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full border ${STATUS_CONFIG[unit.estado].color}`}>
+                        {STATUS_CONFIG[unit.estado].label}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -191,11 +215,7 @@ export function UnitsView() {
                           <Edit2 size={16} className="text-stone-600" />
                         </button>
                         <button 
-                          onClick={() => {
-                            if (window.confirm('¿Estás seguro de eliminar esta unidad?')) {
-                              handleDeleteUnit(unit.id)
-                            }
-                          }}
+                          onClick={() => confirmDelete(unit)}
                           className="p-2 hover:bg-red-50 rounded-lg transition-colors"
                         >
                           <Trash2 size={16} className="text-red-600" />
@@ -213,7 +233,7 @@ export function UnitsView() {
       {/* Footer Summary */}
       <div className="flex items-center justify-between text-sm text-stone-600 bg-white p-4 rounded-xl border border-stone-200">
         <p>Mostrando <span className="font-semibold text-gray-900">{filteredUnits.length}</span> de <span className="font-semibold text-gray-900">{units.length}</span> unidades</p>
-        <p>Capacidad total: <span className="font-semibold text-gray-900">{units.reduce((sum, u) => sum + u.capacity, 0)}</span> personas</p>
+        <p>Capacidad total: <span className="font-semibold text-gray-900">{units.reduce((sum, u) => sum + (u.capacidad || 0), 0)}</span> personas</p>
       </div>
 
       {/* Unit Dialog */}
@@ -225,8 +245,48 @@ export function UnitsView() {
         }}
         unit={selectedUnit}
         onSave={handleSaveUnit}
-        onDelete={handleDeleteUnit}
+        onDelete={(id) => {
+          const unit = units.find(u => u.id === id)
+          confirmDelete(unit)
+        }}
       />
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center">
+          <div 
+            className="fixed inset-0 bg-black/60"
+            onClick={() => setDeleteConfirm({ show: false, unitId: null, unitName: '' })}
+          />
+          <div className="relative bg-white rounded-xl shadow-2xl p-6 max-w-md mx-4 z-70">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Confirmar Eliminación</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  ¿Estás seguro de que deseas eliminar la unidad <span className="font-semibold">"{deleteConfirm.unitName}"</span>? Esta acción no se puede deshacer.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <Button
+                onClick={() => setDeleteConfirm({ show: false, unitId: null, unitName: '' })}
+                className="flex-1 bg-stone-200 border border-stone-300 text-black hover:bg-stone-300 py-2.5 rounded-lg font-medium transition-colors"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleDeleteUnit}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-lg font-medium transition-colors"
+              >
+                Eliminar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

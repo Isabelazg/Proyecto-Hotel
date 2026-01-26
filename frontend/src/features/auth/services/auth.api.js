@@ -5,12 +5,13 @@ export async function loginUser(credentials) {
   return response.data
 }
 
-export async function logoutUser() {
-  const response = await api.post('/auth/logout')
+export async function getCurrentUser() {
+  const response = await api.get('/auth/perfil')
   return response.data
 }
 
-export async function getCurrentUser() {
-  const response = await api.get('/auth/me')
-  return response.data
+export async function logoutUser() {
+  // Simplemente limpiar el localStorage
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
 }

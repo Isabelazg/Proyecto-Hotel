@@ -1,7 +1,18 @@
 import express from "express";
+import cors from "cors";
 import routes from "./routes/index.route.js";
 
 const app = express();
+
+// Configurar CORS
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+app.use(cors({
+	origin: FRONTEND_URL,
+	credentials: true,
+	methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+	allowedHeaders: ["Content-Type", "Authorization"],
+	optionsSuccessStatus: 200
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -24,7 +24,7 @@ export const getHospedajesService = async (req) => {
   if (tipo_hospedaje_id) where.tipo_hospedaje_id = tipo_hospedaje_id;
   if (precio_min) where.precio = { [Op.gte]: precio_min };
   if (precio_max) where.precio = { ...where.precio, [Op.lte]: precio_max };
-  if (estado !== undefined) where.estado = estado === 'true' || estado === true;
+  if (estado) where.estado = estado;
 
   if (search) {
     where[Op.or] = [
@@ -83,7 +83,9 @@ export const createHospedajeService = async (data) => {
       nombre: data.nombre,
       tipo_hospedaje_id: data.tipo_hospedaje_id || null,
       precio: data.precio || null,
-      estado: data.estado !== undefined ? data.estado : true,
+      estado: data.estado || 'disponible',
+      descripcion: data.descripcion || null,
+      capacidad: data.capacidad || 2,
     });
 
     await hospedaje.reload({
@@ -108,6 +110,8 @@ export const updateHospedajeService = async (id, data) => {
       tipo_hospedaje_id: data.tipo_hospedaje_id !== undefined ? data.tipo_hospedaje_id : hospedaje.tipo_hospedaje_id,
       precio: data.precio !== undefined ? data.precio : hospedaje.precio,
       estado: data.estado !== undefined ? data.estado : hospedaje.estado,
+      descripcion: data.descripcion !== undefined ? data.descripcion : hospedaje.descripcion,
+      capacidad: data.capacidad !== undefined ? data.capacidad : hospedaje.capacidad,
     });
 
     await hospedaje.reload({

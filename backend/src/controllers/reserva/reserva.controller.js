@@ -19,6 +19,11 @@ export const getReservas = async (req, res) => {
       fecha_ingreso_hora: reserva.fecha_ingreso_hora,
       fecha_salida_hora: reserva.fecha_salida_hora,
       numero_huespedes: reserva.numero_huespedes,
+      nombre_huesped: reserva.nombre_huesped,
+      apellido_huesped: reserva.apellido_huesped,
+      documento_huesped: reserva.documento_huesped,
+      telefono_huesped: reserva.telefono_huesped,
+      email_huesped: reserva.email_huesped,
       notas: reserva.notas,
       valor: reserva.valor,
       hospedaje: reserva.hospedaje
@@ -59,6 +64,11 @@ export const showReserva = async (req, res) => {
       fecha_ingreso_hora: reserva.fecha_ingreso_hora,
       fecha_salida_hora: reserva.fecha_salida_hora,
       numero_huespedes: reserva.numero_huespedes,
+      nombre_huesped: reserva.nombre_huesped,
+      apellido_huesped: reserva.apellido_huesped,
+      documento_huesped: reserva.documento_huesped,
+      telefono_huesped: reserva.telefono_huesped,
+      email_huesped: reserva.email_huesped,
       notas: reserva.notas,
       valor: reserva.valor,
       hospedaje: reserva.hospedaje
@@ -92,6 +102,11 @@ export const createReserva = async (req, res) => {
       fecha_ingreso_hora,
       fecha_salida_hora,
       numero_huespedes,
+      nombre_huesped,
+      apellido_huesped,
+      documento_huesped,
+      telefono_huesped,
+      email_huesped,
       notas,
       valor
     } = req.body;
@@ -103,6 +118,11 @@ export const createReserva = async (req, res) => {
       fecha_ingreso_hora,
       fecha_salida_hora,
       numero_huespedes,
+      nombre_huesped,
+      apellido_huesped,
+      documento_huesped,
+      telefono_huesped,
+      email_huesped,
       notas,
       valor
     });
@@ -111,9 +131,15 @@ export const createReserva = async (req, res) => {
       id: reserva.id,
       numero_reserva: reserva.numero_reserva,
       estado: reserva.estado,
+      hospedaje_id: reserva.hospedaje_id,
       fecha_ingreso_hora: reserva.fecha_ingreso_hora,
       fecha_salida_hora: reserva.fecha_salida_hora,
       numero_huespedes: reserva.numero_huespedes,
+      nombre_huesped: reserva.nombre_huesped,
+      apellido_huesped: reserva.apellido_huesped,
+      documento_huesped: reserva.documento_huesped,
+      telefono_huesped: reserva.telefono_huesped,
+      email_huesped: reserva.email_huesped,
       notas: reserva.notas,
       valor: reserva.valor,
       hospedaje: reserva.hospedaje
@@ -141,6 +167,11 @@ export const updateReserva = async (req, res) => {
       fecha_ingreso_hora,
       fecha_salida_hora,
       numero_huespedes,
+      nombre_huesped,
+      apellido_huesped,
+      documento_huesped,
+      telefono_huesped,
+      email_huesped,
       notas,
       valor
     } = req.body;
@@ -152,6 +183,11 @@ export const updateReserva = async (req, res) => {
       fecha_ingreso_hora,
       fecha_salida_hora,
       numero_huespedes,
+      nombre_huesped,
+      apellido_huesped,
+      documento_huesped,
+      telefono_huesped,
+      email_huesped,
       notas,
       valor
     });
@@ -160,9 +196,15 @@ export const updateReserva = async (req, res) => {
       id: reserva.id,
       numero_reserva: reserva.numero_reserva,
       estado: reserva.estado,
+      hospedaje_id: reserva.hospedaje_id,
       fecha_ingreso_hora: reserva.fecha_ingreso_hora,
       fecha_salida_hora: reserva.fecha_salida_hora,
       numero_huespedes: reserva.numero_huespedes,
+      nombre_huesped: reserva.nombre_huesped,
+      apellido_huesped: reserva.apellido_huesped,
+      documento_huesped: reserva.documento_huesped,
+      telefono_huesped: reserva.telefono_huesped,
+      email_huesped: reserva.email_huesped,
       notas: reserva.notas,
       valor: reserva.valor,
       hospedaje: reserva.hospedaje

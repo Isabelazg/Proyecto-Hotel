@@ -14,6 +14,10 @@ const Hospedaje = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
+    descripcion: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     tipo_hospedaje_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
@@ -27,10 +31,15 @@ const Hospedaje = sequelize.define(
       type: DataTypes.DECIMAL(12, 2),
       allowNull: true,
     },
-    estado: {
-      type: DataTypes.BOOLEAN,
+    capacidad: {
+      type: DataTypes.INTEGER,
       allowNull: true,
-      defaultValue: true,
+      defaultValue: 2,
+    },
+    estado: {
+      type: DataTypes.ENUM('disponible', 'ocupado', 'mantenimiento'),
+      allowNull: true,
+      defaultValue: 'disponible',
     },
   },
   {

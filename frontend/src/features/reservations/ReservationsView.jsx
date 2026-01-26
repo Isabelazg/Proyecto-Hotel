@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, List } from 'lucide-react'
 import { ReservationDialog } from './components/ReservationDialog'
+import { useReservations } from './hooks/useReservations'
 
 const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 const MONTHS = [
@@ -8,68 +9,20 @@ const MONTHS = [
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
 ]
 
-// Mock data de reservas (ahora será editable)
-const initialReservations = [
-  {
-    id: '1',
-    date: new Date(2026, 0, 8),
-    guestName: 'Mario Díaz',
-    room: 'Habitación Ejecutiva',
-    status: 'reservada',
-    checkIn: '14:00',
-    checkOut: '12:00',
-    guests: 2,
-    notes: ''
-  },
-  {
-    id: '2',
-    date: new Date(2026, 0, 12),
-    guestName: 'Laura Fernández',
-    room: 'Suite 201',
-    status: 'confirmada',
-    checkIn: '15:00',
-    checkOut: '11:00',
-    guests: 1,
-    notes: ''
-  },
-  {
-    id: '3',
-    date: new Date(2026, 0, 15),
-    guestName: 'Carlos Rodríguez',
-    room: 'Habitación Deluxe',
-    status: 'pendiente',
-    checkIn: '15:30',
-    checkOut: '12:00',
-    guests: 3,
-    notes: ''
-  },
-  {
-    id: '4',
-    date: new Date(2026, 0, 20),
-    guestName: 'Ana Martínez',
-    room: 'Suite Premium',
-    status: 'cancelada',
-    checkIn: '16:00',
-    checkOut: '12:00',
-    guests: 2,
-    notes: ''
-  }
-]
-
 const STATUS_CONFIG = {
-  confirmada: { bg: 'bg-green-100', text: 'text-green-800', dot: 'bg-green-500' },
-  reservada: { bg: 'bg-amber-100', text: 'text-amber-800', dot: 'bg-amber-500' },
-  pendiente: { bg: 'bg-orange-100', text: 'text-orange-800', dot: 'bg-orange-500' },
-  cancelada: { bg: 'bg-red-100', text: 'text-red-800', dot: 'bg-red-500' }
+  pendiente: { bg: 'bg-orange-100', text: 'text-orange-800', dot: 'bg-orange-500', label: 'Pendiente' },
+  en_ejecucion: { bg: 'bg-green-100', text: 'text-green-800', dot: 'bg-green-500', label: 'En Ejecución' },
+  terminada: { bg: 'bg-gray-100', text: 'text-gray-800', dot: 'bg-gray-500', label: 'Terminada' }
 }
 
 export function ReservationsView() {
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 0, 1))
+  const [currentDate, setCurrentDate] = useState(new Date())
   const [view, setView] = useState('monthly')
-  const [reservations, setReservations] = useState(initialReservations)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedReservation, setSelectedReservation] = useState(null)
   const [selectedDate, setSelectedDate] = useState(null)
+  
+  const { reservations, isLoading, error, create, update, remove, refetch } = useReservations()
 
   const getDaysInMonth = (date) => {
     const year = date.getFullYear()
@@ -96,9 +49,10 @@ export function ReservationsView() {
 
   const getReservationsForDay = (date) => {
     if (!date) return []
-    return reservations.filter(res => 
-      res.date.toDateString() === date.toDateString()
-    )
+    return reservations.filter(res => {
+      const resDate = new Date(res.fecha_ingreso_hora)
+      return resDate.toDateString() === date.toDateString()
+    })
   }
 
   const handleCreateReservation = (date) => {
@@ -109,30 +63,36 @@ export function ReservationsView() {
 
   const handleEditReservation = (reservation) => {
     setSelectedReservation(reservation)
-    setSelectedDate(reservation.date)
+    setSelectedDate(new Date(reservation.fecha_ingreso_hora))
     setDialogOpen(true)
   }
 
-  const handleSaveReservation = (reservation) => {
-    if (selectedReservation) {
-      // Editar reserva existente
-      setReservations(prev => 
-        prev.map(r => r.id === reservation.id ? reservation : r)
-      )
-    } else {
-      // Crear nueva reserva
-      setReservations(prev => [...prev, reservation])
+  const handleSaveReservation = async (reservationData) => {
+    try {
+      if (selectedReservation) {
+        await update(selectedReservation.id, reservationData)
+      } else {
+        await create(reservationData)
+      }
+      setDialogOpen(false)
+      setSelectedReservation(null)
+      setSelectedDate(null)
+    } catch (err) {
+      console.error('Error saving reservation:', err)
+      alert(err.message || 'Error al guardar la reserva')
     }
-    setDialogOpen(false)
-    setSelectedReservation(null)
-    setSelectedDate(null)
   }
 
-  const handleDeleteReservation = (id) => {
-    setReservations(prev => prev.filter(r => r.id !== id))
-    setDialogOpen(false)
-    setSelectedReservation(null)
-    setSelectedDate(null)
+  const handleDeleteReservation = async (id) => {
+    try {
+      await remove(id)
+      setDialogOpen(false)
+      setSelectedReservation(null)
+      setSelectedDate(null)
+    } catch (err) {
+      console.error('Error deleting reservation:', err)
+      alert(err.message || 'Error al eliminar la reserva')
+    }
   }
 
   const previousMonth = () => {
@@ -143,7 +103,60 @@ export function ReservationsView() {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))
   }
 
-  const days = getDaysInMonth(currentDate)
+  const previousWeek = () => {
+    const newDate = new Date(currentDate)
+    newDate.setDate(currentDate.getDate() - 7)
+    setCurrentDate(newDate)
+  }
+
+  const nextWeek = () => {
+    const newDate = new Date(currentDate)
+    newDate.setDate(currentDate.getDate() + 7)
+    setCurrentDate(newDate)
+  }
+
+  const getWeekDays = (date) => {
+    const dayOfWeek = date.getDay()
+    const startOfWeek = new Date(date)
+    startOfWeek.setDate(date.getDate() - dayOfWeek)
+    
+    const weekDays = []
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek)
+      day.setDate(startOfWeek.getDate() + i)
+      weekDays.push(day)
+    }
+    return weekDays
+  }
+
+  const days = view === 'weekly' ? getWeekDays(currentDate) : getDaysInMonth(currentDate)
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando reservas...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-red-600">Error: {error}</p>
+          <button
+            onClick={refetch}
+            className="mt-4 px-4 py-2 bg-amber-900 text-white rounded-lg hover:bg-amber-800"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -186,22 +199,12 @@ export function ReservationsView() {
         <div className="flex items-center gap-6">
           <span className="text-sm font-medium text-gray-700">Estados:</span>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <span className="text-sm text-gray-600">Confirmada</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-              <span className="text-sm text-gray-600">Reservada</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-              <span className="text-sm text-gray-600">Pendiente</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <span className="text-sm text-gray-600">Cancelada</span>
-            </div>
+            {Object.entries(STATUS_CONFIG).map(([key, config]) => (
+              <div key={key} className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${config.dot}`}></div>
+                <span className="text-sm text-gray-600">{config.label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -212,18 +215,21 @@ export function ReservationsView() {
         <div className="bg-stone-100 px-6 py-4">
           <div className="flex items-center justify-between">
             <button
-              onClick={previousMonth}
+              onClick={view === 'weekly' ? previousWeek : previousMonth}
               className="p-2 hover:bg-white rounded-lg transition-colors"
             >
               <ChevronLeft size={20} className="text-gray-600" />
             </button>
             
             <h2 className="text-2xl font-serif font-bold text-gray-900">
-              {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
+              {view === 'weekly' 
+                ? `Semana del ${days[0]?.getDate()} ${MONTHS[days[0]?.getMonth()]} - ${days[6]?.getDate()} ${MONTHS[days[6]?.getMonth()]} ${currentDate.getFullYear()}`
+                : `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`
+              }
             </h2>
             
             <button
-              onClick={nextMonth}
+              onClick={view === 'weekly' ? nextWeek : nextMonth}
               className="p-2 hover:bg-white rounded-lg transition-colors"
             >
               <ChevronRight size={20} className="text-gray-600" />
@@ -244,7 +250,7 @@ export function ReservationsView() {
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7">
+        <div className={view === 'weekly' ? 'grid grid-cols-7' : 'grid grid-cols-7'}>
           {days.map((date, index) => {
             const reservations = getReservationsForDay(date)
             const isToday = date && date.toDateString() === new Date().toDateString()
@@ -252,7 +258,7 @@ export function ReservationsView() {
             return (
               <div
                 key={index}
-                className={`min-h-[120px] border-r border-b border-gray-200 last:border-r-0 p-2 ${
+                className={`${view === 'weekly' ? 'min-h-[200px]' : 'min-h-[120px]'} border-r border-b border-gray-200 last:border-r-0 p-2 ${
                   date ? 'bg-white hover:bg-stone-50 cursor-pointer' : 'bg-gray-50'
                 } ${isToday ? 'bg-amber-50' : ''}`}
                 onClick={() => date && handleCreateReservation(date)}
@@ -270,7 +276,8 @@ export function ReservationsView() {
                     {/* Reservations for this day */}
                     <div className="space-y-1">
                       {reservations.map(reservation => {
-                        const statusConfig = STATUS_CONFIG[reservation.status]
+                        const statusConfig = STATUS_CONFIG[reservation.estado] || STATUS_CONFIG.pendiente
+                        const hospedajeName = reservation.hospedaje?.nombre || 'Sin hospedaje'
                         return (
                           <div
                             key={reservation.id}
@@ -280,8 +287,8 @@ export function ReservationsView() {
                             }}
                             className={`${statusConfig.bg} ${statusConfig.text} px-2 py-1 rounded text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity`}
                           >
-                            <div className="font-semibold truncate">{reservation.guestName}</div>
-                            <div className="text-xs truncate">{reservation.room}</div>
+                            <div className="font-semibold truncate">{reservation.numero_reserva}</div>
+                            <div className="text-xs truncate">{hospedajeName}</div>
                           </div>
                         )
                       })}

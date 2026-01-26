@@ -6,6 +6,10 @@ export const createHospedajeValidator = [
     .trim()
     .notEmpty().withMessage('El nombre es requerido.')
     .isLength({ max: 50 }).withMessage('El nombre debe tener máximo 50 caracteres.'),
+  body('descripcion')
+    .optional()
+    .trim()
+    .isLength({ max: 255 }).withMessage('La descripción debe tener máximo 255 caracteres.'),
   body('tipo_hospedaje_id')
     .optional()
     .isInt().withMessage('El tipo_hospedaje_id debe ser un número entero.')
@@ -23,9 +27,12 @@ export const createHospedajeValidator = [
       if (precio && parseFloat(precio) < 0) throw new Error('El precio no puede ser negativo.');
       return true;
     }),
+  body('capacidad')
+    .optional()
+    .isInt({ min: 1 }).withMessage('La capacidad debe ser un número entero mayor a 0.'),
   body('estado')
     .optional()
-    .isBoolean().withMessage('El estado debe ser un valor booleano (true/false).'),
+    .isIn(['disponible', 'ocupado', 'mantenimiento']).withMessage('El estado debe ser: disponible, ocupado o mantenimiento.'),
 ];
 
 export const updateHospedajeValidator = [
@@ -33,6 +40,10 @@ export const updateHospedajeValidator = [
     .optional()
     .trim()
     .isLength({ max: 50 }).withMessage('El nombre debe tener máximo 50 caracteres.'),
+  body('descripcion')
+    .optional()
+    .trim()
+    .isLength({ max: 255 }).withMessage('La descripción debe tener máximo 255 caracteres.'),
   body('tipo_hospedaje_id')
     .optional()
     .isInt().withMessage('El tipo_hospedaje_id debe ser un número entero.')
@@ -50,13 +61,16 @@ export const updateHospedajeValidator = [
       if (precio && parseFloat(precio) < 0) throw new Error('El precio no puede ser negativo.');
       return true;
     }),
+  body('capacidad')
+    .optional()
+    .isInt({ min: 1 }).withMessage('La capacidad debe ser un número entero mayor a 0.'),
   body('estado')
     .optional()
-    .isBoolean().withMessage('El estado debe ser un valor booleano (true/false).'),
+    .isIn(['disponible', 'ocupado', 'mantenimiento']).withMessage('El estado debe ser: disponible, ocupado o mantenimiento.'),
 ];
 
 export const updateHospedajeEstadoValidator = [
   body('estado')
     .notEmpty().withMessage('El estado es requerido.')
-    .isBoolean().withMessage('El estado debe ser un valor booleano (true/false).'),
+    .isIn(['disponible', 'ocupado', 'mantenimiento']).withMessage('El estado debe ser: disponible, ocupado o mantenimiento.'),
 ];

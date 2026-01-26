@@ -41,8 +41,28 @@ const Reserva = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    notas: {
+    nombre_huesped: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    apellido_huesped: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    documento_huesped: {
       type: DataTypes.STRING(50),
+      allowNull: true,
+    },
+    telefono_huesped: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+    },
+    email_huesped: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    notas: {
+      type: DataTypes.STRING(255),
       allowNull: true,
     },
     valor: {

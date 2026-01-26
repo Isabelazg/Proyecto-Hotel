@@ -16,6 +16,8 @@ export const getHospedajes = async (req, res) => {
       nombre: hospedaje.nombre,
       precio: hospedaje.precio,
       estado: hospedaje.estado,
+      descripcion: hospedaje.descripcion,
+      capacidad: hospedaje.capacidad,
       tipo_hospedaje: hospedaje.tipo_hospedaje
         ? {
           id: hospedaje.tipo_hospedaje.id,
@@ -45,6 +47,8 @@ export const showHospedaje = async (req, res) => {
       nombre: hospedaje.nombre,
       precio: hospedaje.precio,
       estado: hospedaje.estado,
+      descripcion: hospedaje.descripcion,
+      capacidad: hospedaje.capacidad,
       tipo_hospedaje: hospedaje.tipo_hospedaje
         ? {
           id: hospedaje.tipo_hospedaje.id,
@@ -62,13 +66,15 @@ export const showHospedaje = async (req, res) => {
 
 export const createHospedaje = async (req, res) => {
   try {
-    const { nombre, tipo_hospedaje_id, precio, estado } = req.body;
-    const hospedaje = await createHospedajeService({ nombre, tipo_hospedaje_id, precio, estado });
+    const { nombre, tipo_hospedaje_id, precio, estado, descripcion, capacidad } = req.body;
+    const hospedaje = await createHospedajeService({ nombre, tipo_hospedaje_id, precio, estado, descripcion, capacidad });
     return successResponse(res, {
       id: hospedaje.id,
       nombre: hospedaje.nombre,
       precio: hospedaje.precio,
       estado: hospedaje.estado,
+      descripcion: hospedaje.descripcion,
+      capacidad: hospedaje.capacidad,
       tipo_hospedaje: hospedaje.tipo_hospedaje
         ? {
           id: hospedaje.tipo_hospedaje.id,
@@ -86,13 +92,15 @@ export const createHospedaje = async (req, res) => {
 
 export const updateHospedaje = async (req, res) => {
   try {
-    const { nombre, tipo_hospedaje_id, precio, estado } = req.body;
-    const hospedaje = await updateHospedajeService(req.params.id, { nombre, tipo_hospedaje_id, precio, estado });
+    const { nombre, tipo_hospedaje_id, precio, estado, descripcion, capacidad } = req.body;
+    const hospedaje = await updateHospedajeService(req.params.id, { nombre, tipo_hospedaje_id, precio, estado, descripcion, capacidad });
     return successResponse(res, {
       id: hospedaje.id,
       nombre: hospedaje.nombre,
       precio: hospedaje.precio,
       estado: hospedaje.estado,
+      descripcion: hospedaje.descripcion,
+      capacidad: hospedaje.capacidad,
       tipo_hospedaje: hospedaje.tipo_hospedaje
         ? {
           id: hospedaje.tipo_hospedaje.id,

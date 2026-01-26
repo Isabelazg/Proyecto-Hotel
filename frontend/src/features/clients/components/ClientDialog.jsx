@@ -4,73 +4,110 @@ import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
 import { Textarea } from '@/shared/components/ui/Textarea'
 
-const STATUSES = [
-  { value: 'activo', label: 'Activo' },
-  { value: 'inactivo', label: 'Inactivo' }
-]
-
 export function ClientDialog({ open, onClose, client, onSave, onDelete }) {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    document: '',
-    address: '',
-    city: '',
-    country: '',
-    status: 'activo',
-    notes: ''
+    nombre: '',
+    apellido: '',
+    correo: '',
+    telefono: '',
+    documento: '',
+    contrasena: ''
   })
+  const [errors, setErrors] = useState({})
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   useEffect(() => {
     if (client) {
       setFormData({
-        name: client.name || '',
-        email: client.email || '',
-        phone: client.phone || '',
-        document: client.document || '',
-        address: client.address || '',
-        city: client.city || '',
-        country: client.country || '',
-        status: client.status || 'activo',
-        notes: client.notes || ''
+        nombre: client.nombre || '',
+        apellido: client.apellido || '',
+        correo: client.correo || '',
+        telefono: client.telefono?.toString() || '',
+        documento: client.documento?.toString() || '',
+        contrasena: ''
       })
     } else {
       setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        document: '',
-        address: '',
-        city: '',
-        country: '',
-        status: 'activo',
-        notes: ''
+        nombre: '',
+        apellido: '',
+        correo: '',
+        telefono: '',
+        documento: '',
+        contrasena: ''
       })
     }
+    setErrors({})
+    setShowDeleteConfirm(false)
   }, [client, open])
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!formData.name || !formData.email || !formData.document) return
+    
+    const newErrors = {}
+    
+    if (!formData.nombre || !formData.nombre.trim()) {
+      newErrors.nombre = 'El nombre es requerido'
+    } else if (formData.nombre.length > 100) {
+      newErrors.nombre = 'El nombre no puede exceder 100 caracteres'
+    }
+    
+    if (!formData.apellido || !formData.apellido.trim()) {
+      newErrors.apellido = 'El apellido es requerido'
+    } else if (formData.apellido.length > 100) {
+      newErrors.apellido = 'El apellido no puede exceder 100 caracteres'
+    }
+    
+    if (!formData.correo || !formData.correo.trim()) {
+      newErrors.correo = 'El correo es requerido'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.correo)) {
+      newErrors.correo = 'Correo inválido'
+    } else if (formData.correo.length > 100) {
+      newErrors.correo = 'El correo no puede exceder 100 caracteres'
+    }
+    
+    if (!client && (!formData.contrasena || !formData.contrasena.trim())) {
+      newErrors.contrasena = 'La contraseña es requerida'
+    } else if (formData.contrasena && formData.contrasena.length < 6) {
+      newErrors.contrasena = 'La contraseña debe tener al menos 6 caracteres'
+    }
+    
+    if (formData.documento && formData.documento.length > 20) {
+      newErrors.documento = 'El documento no puede exceder 20 dígitos'
+    }
+    
+    if (formData.telefono && formData.telefono.length > 20) {
+      newErrors.telefono = 'El teléfono no puede exceder 20 dígitos'
+    }
 
-    onSave({
-      id: client?.id || Date.now().toString(),
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      document: formData.document,
-      address: formData.address,
-      city: formData.city,
-      country: formData.country,
-      status: formData.status,
-      notes: formData.notes,
-      reservations: client?.reservations || 0
-    })
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      
+      const firstErrorField = Object.keys(newErrors)[0]
+      const element = document.getElementById(firstErrorField)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        setTimeout(() => element.focus(), 300)
+      }
+      return
+    }
+
+    const dataToSend = {
+      nombre: formData.nombre.trim(),
+      apellido: formData.apellido.trim(),
+      correo: formData.correo.trim(),
+      telefono: formData.telefono ? parseInt(formData.telefono) : null,
+      documento: formData.documento ? parseInt(formData.documento) : null
+    }
+
+    if (formData.contrasena) {
+      dataToSend.contrasena = formData.contrasena
+    }
+
+    onSave(dataToSend)
   }
 
-  const handleDelete = () => {
-    if (client && window.confirm('¿Estás seguro de eliminar este cliente?')) {
+  const confirmDelete = () => {
+    if (client) {
       onDelete(client.id)
     }
   }
@@ -115,151 +152,102 @@ export function ClientDialog({ open, onClose, client, onSave, onDelete }) {
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Información Personal</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Name */}
-              <div className="md:col-span-2 space-y-2">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Nombre Completo
+              {/* Nombre */}
+              <div className="space-y-2">
+                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
+                  Nombre
                 </label>
                 <Input
-                  id="name"
+                  id="nombre"
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Ej: María González"
+                  value={formData.nombre}
+                  onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                  placeholder="Ej: María"
                   className="h-12"
-                  required
                 />
+                {errors.nombre && <p className="text-red-600 text-sm">{errors.nombre}</p>}
+              </div>
+
+              {/* Apellido */}
+              <div className="space-y-2">
+                <label htmlFor="apellido" className="block text-sm font-medium text-gray-700">
+                  Apellido
+                </label>
+                <Input
+                  id="apellido"
+                  type="text"
+                  value={formData.apellido}
+                  onChange={(e) => setFormData({ ...formData, apellido: e.target.value })}
+                  placeholder="Ej: González"
+                  className="h-12"
+                />
+                {errors.apellido && <p className="text-red-600 text-sm">{errors.apellido}</p>}
               </div>
 
               {/* Email */}
               <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="correo" className="block text-sm font-medium text-gray-700">
                   Correo Electrónico
                 </label>
                 <Input
-                  id="email"
+                  id="correo"
                   type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  value={formData.correo}
+                  onChange={(e) => setFormData({ ...formData, correo: e.target.value })}
                   placeholder="ejemplo@email.com"
                   className="h-12"
-                  required
                 />
+                {errors.correo && <p className="text-red-600 text-sm">{errors.correo}</p>}
               </div>
 
               {/* Phone */}
               <div className="space-y-2">
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="telefono" className="block text-sm font-medium text-gray-700">
                   Teléfono
                 </label>
                 <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+1 234-567-8900"
+                  id="telefono"
+                  type="number"
+                  value={formData.telefono}
+                  onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                  placeholder="1234567890"
                   className="h-12"
                 />
+                {errors.telefono && <p className="text-red-600 text-sm">{errors.telefono}</p>}
               </div>
 
               {/* Document */}
               <div className="space-y-2">
-                <label htmlFor="document" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="documento" className="block text-sm font-medium text-gray-700">
                   Documento de Identidad
                 </label>
                 <Input
-                  id="document"
-                  type="text"
-                  value={formData.document}
-                  onChange={(e) => setFormData({ ...formData, document: e.target.value })}
-                  placeholder="DNI 12345678"
+                  id="documento"
+                  type="number"
+                  value={formData.documento}
+                  onChange={(e) => setFormData({ ...formData, documento: e.target.value })}
+                  placeholder="12345678"
                   className="h-12"
-                  required
                 />
+                {errors.documento && <p className="text-red-600 text-sm">{errors.documento}</p>}
               </div>
 
-              {/* Status */}
+              {/* Password */}
               <div className="space-y-2">
-                <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                  Estado
+                <label htmlFor="contrasena" className="block text-sm font-medium text-gray-700">
+                  Contraseña {client && <span className="text-xs text-stone-500">(dejar vacío para mantener)</span>}
                 </label>
-                <select
-                  id="status"
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full h-12 px-4 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent"
-                >
-                  {STATUSES.map(status => (
-                    <option key={status.value} value={status.value}>{status.label}</option>
-                  ))}
-                </select>
+                <Input
+                  id="contrasena"
+                  type="password"
+                  value={formData.contrasena}
+                  onChange={(e) => setFormData({ ...formData, contrasena: e.target.value })}
+                  placeholder="••••••••"
+                  className="h-12"
+                />
+                {errors.contrasena && <p className="text-red-600 text-sm">{errors.contrasena}</p>}
               </div>
             </div>
-          </div>
-
-          {/* Address Information */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Dirección</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Address */}
-              <div className="md:col-span-2 space-y-2">
-                <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                  Dirección
-                </label>
-                <Input
-                  id="address"
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  placeholder="Calle Principal 123"
-                  className="h-12"
-                />
-              </div>
-
-              {/* City */}
-              <div className="space-y-2">
-                <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-                  Ciudad
-                </label>
-                <Input
-                  id="city"
-                  type="text"
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  placeholder="Madrid"
-                  className="h-12"
-                />
-              </div>
-
-              {/* Country */}
-              <div className="space-y-2">
-                <label htmlFor="country" className="block text-sm font-medium text-gray-700">
-                  País
-                </label>
-                <Input
-                  id="country"
-                  type="text"
-                  value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  placeholder="España"
-                  className="h-12"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Notes */}
-          <div className="space-y-2">
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
-              Notas Adicionales
-            </label>
-            <Textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Preferencias, observaciones especiales..."
-              rows={3}
-            />
           </div>
 
           {/* Footer */}
@@ -268,7 +256,7 @@ export function ClientDialog({ open, onClose, client, onSave, onDelete }) {
               {isEditing && (
                 <Button
                   type="button"
-                  onClick={handleDelete}
+                  onClick={() => setShowDeleteConfirm(true)}
                   className="flex items-center gap-2 bg-red-900 hover:bg-red-950 text-white px-4 py-2.5 rounded-lg font-medium transition-colors"
                 >
                   <Trash2 size={16} />
@@ -294,6 +282,43 @@ export function ClientDialog({ open, onClose, client, onSave, onDelete }) {
           </div>
         </form>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center">
+          <div 
+            className="fixed inset-0 bg-black/60"
+            onClick={() => setShowDeleteConfirm(false)}
+          />
+          <div className="relative bg-white rounded-xl shadow-2xl p-6 max-w-md mx-4 z-70">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Confirmar Eliminación</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  ¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <Button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 bg-stone-200 border border-stone-300 text-black hover:bg-stone-300 py-2.5 rounded-lg font-medium transition-colors"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={confirmDelete}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-lg font-medium transition-colors"
+              >
+                Eliminar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
