@@ -22,10 +22,9 @@ router.get(
   UsuarioController.showUser
 );
 
-// Crea un nuevo usuario (privado)
+// Crea un nuevo usuario (público)
 router.post(
   '/',
-  verificarToken,
   registerUserValidator,
   validateRequest,
   UsuarioController.createUser
