@@ -212,174 +212,178 @@ export function ReportsView() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-serif font-bold text-gray-900">Reportes</h1>
-          <p className="text-stone-600 mt-1">Genera y descarga reportes personalizados del hotel</p>
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-emerald-50 to-lime-50 -m-6 p-6">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-light tracking-wide text-emerald-950">Reportes</h1>
+            <p className="text-gray-700 mt-2 font-light">Genera y descarga reportes personalizados del hotel</p>
+          </div>
+          {reportData && (
+            <Button 
+              onClick={() => handleDownloadReport(reportData.type)}
+              className="bg-gradient-to-r from-emerald-600 to-green-600 hover:scale-105 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2 shadow-lg transition-all duration-300"
+            >
+              <Download size={18} />
+              Descargar Último Reporte
+            </Button>
+          )}
         </div>
-        {reportData && (
-          <Button 
-            onClick={() => handleDownloadReport(reportData.type)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg font-medium flex items-center gap-2"
-          >
-            <Download size={18} />
-            Descargar Último Reporte
-          </Button>
+
+        {/* Quick Stats */}
+        {isLoadingStats ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600 mx-auto"></div>
+              <p className="mt-3 text-gray-700 text-sm font-light">Cargando estadísticas...</p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="bg-gradient-to-br from-emerald-600 via-green-600 to-emerald-500 p-5 rounded-3xl shadow-xl shadow-black/20 border border-emerald-400/30 transition-all duration-300 hover:scale-105">
+              <p className="text-xs text-emerald-100 tracking-wide mb-1">Ingresos Totales</p>
+              <p className="text-2xl font-light text-white">${stats.totalRevenue.toLocaleString()}</p>
+            </div>
+            <div className="bg-gradient-to-br from-emerald-700 via-green-700 to-emerald-600 p-5 rounded-3xl shadow-xl shadow-black/20 border border-emerald-500/30 transition-all duration-300 hover:scale-105">
+              <p className="text-xs text-emerald-100 tracking-wide mb-1">Reservas</p>
+              <p className="text-2xl font-light text-white">{stats.totalReservations}</p>
+            </div>
+            <div className="bg-gradient-to-br from-emerald-800 via-green-800 to-emerald-700 p-5 rounded-3xl shadow-xl shadow-black/20 border border-emerald-600/30 transition-all duration-300 hover:scale-105">
+              <p className="text-xs text-emerald-200 tracking-wide mb-1">Ocupación Prom.</p>
+              <p className="text-2xl font-light text-white">{stats.averageOccupancy}%</p>
+            </div>
+            <div className="bg-gradient-to-br from-green-700 via-emerald-700 to-green-600 p-5 rounded-3xl shadow-xl shadow-black/20 border border-green-500/30 transition-all duration-300 hover:scale-105">
+              <p className="text-xs text-emerald-100 tracking-wide mb-1">Clientes</p>
+              <p className="text-2xl font-light text-white">{stats.totalClients}</p>
+            </div>
+            <div className="bg-gradient-to-br from-emerald-900 via-green-900 to-emerald-800 p-5 rounded-3xl shadow-xl shadow-black/20 border border-emerald-700/30 transition-all duration-300 hover:scale-105">
+              <p className="text-xs text-emerald-200 tracking-wide mb-1">Pagos Totales</p>
+              <p className="text-2xl font-light text-white">{stats.completedPayments}</p>
+            </div>
+            <div className="bg-gradient-to-br from-amber-600 via-orange-600 to-amber-500 p-5 rounded-3xl shadow-xl shadow-black/20 border border-amber-400/30 transition-all duration-300 hover:scale-105">
+              <p className="text-xs text-amber-100 tracking-wide mb-1">Reservas Pendientes</p>
+              <p className="text-2xl font-light text-white">{stats.pendingPayments}</p>
+            </div>
+          </div>
         )}
-      </div>
 
-      {/* Quick Stats */}
-      {isLoadingStats ? (
-        <div className="flex items-center justify-center h-32">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-900 mx-auto"></div>
-            <p className="mt-3 text-gray-600 text-sm">Cargando estadísticas...</p>
+        {/* Date Range Filter */}
+        <div className="bg-white/80 backdrop-blur-lg p-6 rounded-3xl shadow-xl shadow-black/10 border-2 border-emerald-200/50">
+          <div className="flex items-center gap-3 mb-4">
+            <Filter className="text-emerald-700" size={18} />
+            <h2 className="font-medium tracking-wide text-emerald-950">Filtros de Fecha</h2>
           </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
-            <p className="text-xs text-green-800 font-medium mb-1">Ingresos Totales</p>
-            <p className="text-2xl font-bold text-green-900">${stats.totalRevenue.toLocaleString()}</p>
-          </div>
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
-            <p className="text-xs text-blue-800 font-medium mb-1">Reservas</p>
-            <p className="text-2xl font-bold text-blue-900">{stats.totalReservations}</p>
-          </div>
-          <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-xl border border-amber-200">
-            <p className="text-xs text-amber-800 font-medium mb-1">Ocupación Prom.</p>
-            <p className="text-2xl font-bold text-amber-900">{stats.averageOccupancy}%</p>
-          </div>
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200">
-            <p className="text-xs text-purple-800 font-medium mb-1">Clientes</p>
-            <p className="text-2xl font-bold text-purple-900">{stats.totalClients}</p>
-          </div>
-          <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 rounded-xl border border-indigo-200">
-            <p className="text-xs text-indigo-800 font-medium mb-1">Pagos Totales</p>
-            <p className="text-2xl font-bold text-indigo-900">{stats.completedPayments}</p>
-          </div>
-          <div className="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-xl border border-red-200">
-            <p className="text-xs text-red-800 font-medium mb-1">Reservas Pendientes</p>
-            <p className="text-2xl font-bold text-red-900">{stats.pendingPayments}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Date Range Filter */}
-      <div className="bg-white p-5 rounded-xl border border-stone-200">
-        <div className="flex items-center gap-3 mb-3">
-          <Filter className="text-stone-600" size={18} />
-          <h2 className="font-semibold text-gray-900">Filtros de Fecha</h2>
-        </div>
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Fecha Inicio</label>
-            <Input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className="h-11"
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Fecha Fin</label>
-            <Input
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-              className="h-11"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Report Types Grid */}
-      <div>
-        <h2 className="text-xl font-serif font-bold text-gray-900 mb-4">Tipos de Reportes</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {REPORT_TYPES.map(report => {
-            const Icon = report.icon
-            const isActive = selectedType === report.id
-            return (
-              <div 
-                key={report.id}
-                className={`bg-white rounded-xl border p-6 hover:shadow-lg transition-all cursor-pointer group ${
-                  isActive ? 'border-amber-500 ring-2 ring-amber-200' : 'border-stone-200'
-                }`}
-                onClick={() => !isGenerating && handleGenerateReport(report.id)}
-              >
-                <div className={`inline-flex p-3 rounded-lg border ${report.color} mb-4`}>
-                  <Icon size={24} />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-amber-900 transition-colors">
-                  {report.title}
-                </h3>
-                <p className="text-sm text-stone-600 mb-4">
-                  {report.description}
-                </p>
-                <Button 
-                  disabled={isGenerating}
-                  className={`w-full py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 ${
-                    isActive 
-                      ? 'bg-amber-900 hover:bg-amber-800 text-white' 
-                      : 'bg-black hover:bg-stone-900 text-white'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  <FileText size={16} />
-                  {isGenerating && isActive ? 'Generando...' : 'Generar Reporte'}
-                </Button>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Generated Report Summary */}
-      {reportData && (
-        <div className="bg-white rounded-xl border border-stone-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-serif font-bold text-gray-900">Último Reporte Generado</h2>
-            <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-              ✓ Generado
-            </span>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">Tipo de Reporte</p>
-                <p className="font-semibold text-gray-900">
-                  {REPORT_TYPES.find(t => t.id === reportData.type)?.title || reportData.type}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Fecha de Generación</p>
-                <p className="font-semibold text-gray-900">
-                  {new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Total de Registros</p>
-                <p className="font-semibold text-gray-900">
-                  {Object.values(reportData).filter(Array.isArray).flat().length}
-                </p>
-              </div>
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Fecha Inicio</label>
+              <Input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="h-12 rounded-2xl border-2 border-emerald-200 focus:border-emerald-400 focus:ring-emerald-400"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Fecha Fin</label>
+              <Input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="h-12 rounded-2xl border-2 border-emerald-200 focus:border-emerald-400 focus:ring-emerald-400"
+              />
             </div>
           </div>
         </div>
-      )}
 
-      {/* Info Notice */}
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
-        <div className="flex items-start gap-3">
-          <FileText className="text-amber-700 flex-shrink-0 mt-0.5" size={20} />
-          <div>
-            <h3 className="font-semibold text-amber-900 mb-1">Generación de Reportes</h3>
-            <p className="text-sm text-amber-800">
-              Selecciona un tipo de reporte y configura el rango de fechas para generar reportes personalizados. 
-              Los reportes se pueden exportar en formato PDF o Excel para análisis detallado.
-            </p>
+        {/* Report Types Grid */}
+        <div>
+          <h2 className="text-2xl font-light tracking-wide text-emerald-950 mb-6">Tipos de Reportes</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {REPORT_TYPES.map(report => {
+              const Icon = report.icon
+              const isActive = selectedType === report.id
+              return (
+                <div 
+                  key={report.id}
+                  className={`bg-white/80 backdrop-blur-lg rounded-3xl border-2 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group ${
+                    isActive ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-xl scale-105' : 'border-emerald-200/50 hover:border-emerald-300'
+                  }`}
+                  onClick={() => !isGenerating && handleGenerateReport(report.id)}
+                >
+                  <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-emerald-100 to-green-100 border-2 border-emerald-200 mb-4 shadow-lg">
+                    <Icon size={24} className="text-emerald-700" />
+                  </div>
+                  <h3 className="text-lg font-medium tracking-wide text-emerald-950 mb-2 group-hover:text-emerald-700 transition-colors">
+                    {report.title}
+                  </h3>
+                  <p className="text-sm text-gray-700 font-light mb-4">
+                    {report.description}
+                  </p>
+                  <Button 
+                    disabled={isGenerating}
+                    className={`w-full py-3 rounded-full font-medium flex items-center justify-center gap-2 transition-all duration-300 shadow-lg ${
+                      isActive 
+                        ? 'bg-gradient-to-r from-emerald-600 to-green-600 hover:scale-105 text-white' 
+                        : 'bg-gradient-to-r from-emerald-700 to-green-700 hover:scale-105 text-white'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    <FileText size={16} />
+                    {isGenerating && isActive ? 'Generando...' : 'Generar Reporte'}
+                  </Button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Generated Report Summary */}
+        {reportData && (
+          <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl shadow-black/10 border-2 border-emerald-200/50 p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-light tracking-wide text-emerald-950">Último Reporte Generado</h2>
+              <span className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-sm font-medium rounded-full shadow-lg">
+                ✓ Generado
+              </span>
+            </div>
+            <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-6 border-2 border-emerald-200">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <p className="text-sm text-gray-700 font-light mb-1">Tipo de Reporte</p>
+                  <p className="font-medium text-emerald-950">
+                    {REPORT_TYPES.find(t => t.id === reportData.type)?.title || reportData.type}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-700 font-light mb-1">Fecha de Generación</p>
+                  <p className="font-medium text-emerald-950">
+                    {new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-700 font-light mb-1">Total de Registros</p>
+                  <p className="font-medium text-emerald-950">
+                    {Object.values(reportData).filter(Array.isArray).flat().length}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Info Notice */}
+        <div className="bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-3xl p-6 shadow-lg">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-white rounded-2xl shadow-lg border-2 border-emerald-200">
+              <FileText className="text-emerald-700 flex-shrink-0" size={24} />
+            </div>
+            <div>
+              <h3 className="font-medium tracking-wide text-emerald-950 mb-2">Generación de Reportes</h3>
+              <p className="text-sm text-gray-700 font-light">
+                Selecciona un tipo de reporte y configura el rango de fechas para generar reportes personalizados. 
+                Los reportes se pueden exportar en formato PDF o Excel para análisis detallado.
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -34,8 +34,8 @@ export function useAuth() {
       localStorage.setItem('user', JSON.stringify(usuario))
       
       console.log('Login exitoso, redirigiendo...')
-      // Redirigir al dashboard (ruta raíz)
-      navigate('/', { replace: true })
+      // Redirigir al dashboard administrativo
+      navigate('/admin', { replace: true })
       
     } catch (err) {
       console.error('Error en login:', err)

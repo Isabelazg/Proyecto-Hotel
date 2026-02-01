@@ -3,6 +3,7 @@ import { X, Trash2 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
 import { Textarea } from '@/shared/components/ui/Textarea'
+import { CustomSelect } from '@/shared/components/ui/Select'
 import { getTiposHospedaje } from '../services/tipoHospedaje.api'
 
 const STATUSES = [
@@ -127,22 +128,22 @@ export function UnitDialog({ open, onClose, unit, onSave, onDelete }) {
   const isEditing = !!unit
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Overlay */}
       <div 
-        className="fixed inset-0 bg-black/50"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
       
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto">
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+      {/* Modal Container with proper containment */}
+      <div className="relative bg-gradient-to-br from-white to-emerald-50/30 rounded-3xl border-2 border-emerald-200 shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Header - Fixed */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-900 via-green-900 to-emerald-800 border-b-2 border-emerald-700 px-8 py-6 flex items-center justify-between rounded-t-3xl">
           <div>
-            <h2 className="text-2xl font-serif font-bold text-gray-900">
+            <h2 className="text-3xl font-light tracking-wide text-white">
               {isEditing ? 'Editar Unidad' : 'Nueva Unidad'}
             </h2>
-            <p className="text-sm text-stone-600 mt-1">
+            <p className="text-sm text-emerald-100 mt-2 font-light">
               {isEditing
                 ? 'Modifica los detalles de la unidad de alojamiento'
                 : 'Completa los detalles para crear una nueva unidad'}
@@ -150,14 +151,15 @@ export function UnitDialog({ open, onClose, unit, onSave, onDelete }) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-stone-100 rounded-lg transition-colors"
+            className="p-2.5 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
           >
-            <X size={20} className="text-stone-600" />
+            <X size={22} className="text-white" />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        {/* Form - Scrollable content */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <form id="unit-form" onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Nombre */}
             <div className="space-y-2">
@@ -170,7 +172,7 @@ export function UnitDialog({ open, onClose, unit, onSave, onDelete }) {
                 value={formData.nombre}
                 onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
                 placeholder="Ej: Habitación 101"
-                className="h-12"
+                className="h-12 px-4"
               />
               {errors.nombre && <p className="text-red-600 text-sm">{errors.nombre}</p>}
             </div>
@@ -180,19 +182,16 @@ export function UnitDialog({ open, onClose, unit, onSave, onDelete }) {
               <label htmlFor="tipo_hospedaje_id" className="block text-sm font-medium text-gray-700">
                 Tipo de Hospedaje
               </label>
-              <select
-                id="tipo_hospedaje_id"
+              <CustomSelect
+                options={tiposHospedaje.map(tipo => ({
+                  value: tipo.id,
+                  label: tipo.nombre
+                }))}
                 value={formData.tipo_hospedaje_id}
-                onChange={(e) => setFormData({ ...formData, tipo_hospedaje_id: e.target.value })}
-                className="w-full h-12 px-4 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent"
-              >
-                <option value="">Selecciona un tipo</option>
-                {tiposHospedaje.map(tipo => (
-                  <option key={tipo.id} value={tipo.id}>
-                    {tipo.nombre}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setFormData({ ...formData, tipo_hospedaje_id: value })}
+                placeholder="Selecciona un tipo"
+                error={errors.tipo_hospedaje_id}
+              />
               {errors.tipo_hospedaje_id && <p className="text-red-600 text-sm">{errors.tipo_hospedaje_id}</p>}
             </div>
 
@@ -236,16 +235,12 @@ export function UnitDialog({ open, onClose, unit, onSave, onDelete }) {
               <label htmlFor="estado" className="block text-sm font-medium text-gray-700">
                 Estado
               </label>
-              <select
-                id="estado"
+              <CustomSelect
+                options={STATUSES}
                 value={formData.estado}
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-                className="w-full h-12 px-4 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent"
-              >
-                {STATUSES.map(status => (
-                  <option key={status.value} value={status.value}>{status.label}</option>
-                ))}
-              </select>
+                onChange={(value) => setFormData({ ...formData, estado: value })}
+                placeholder="Selecciona el estado"
+              />
             </div>
           </div>
 
@@ -263,69 +258,71 @@ export function UnitDialog({ open, onClose, unit, onSave, onDelete }) {
             />
             {errors.descripcion && <p className="text-red-600 text-sm">{errors.descripcion}</p>}
           </div>
+          </form>
+        </div>
 
-          {/* Footer */}
-          <div className="sticky bottom-0 bg-white border-t border-stone-200 -mx-6 px-6 py-4">
-            <div className="flex gap-3">
-              {isEditing && (
-                <Button
-                  type="button"
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="flex items-center gap-2 bg-red-900 hover:bg-red-950 text-white px-4 py-2.5 rounded-lg font-medium transition-colors"
-                >
-                  <Trash2 size={16} />
-                  Eliminar
-                </Button>
-              )}
-              <div className="flex-1 flex gap-3">
-                <Button
-                  type="button"
-                  onClick={onClose}
-                  className="flex-1 bg-stone-200 border border-stone-300 text-black hover:bg-stone-300 py-2.5 rounded-lg font-medium transition-colors"
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  className="flex-1 bg-black hover:bg-stone-900 text-white py-2.5 rounded-lg font-medium transition-colors"
-                >
-                  {isEditing ? 'Guardar Cambios' : 'Crear Unidad'}
-                </Button>
-              </div>
+        {/* Footer - Fixed */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-50 to-green-50 border-t-2 border-emerald-200 px-8 py-5 rounded-b-3xl">
+          <div className="flex gap-4">
+            {isEditing && (
+              <Button
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:scale-105 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
+              >
+                <Trash2 size={18} />
+                Eliminar
+              </Button>
+            )}
+            <div className="flex-1 flex gap-4">
+              <Button
+                type="button"
+                onClick={onClose}
+                className="flex-1 bg-gradient-to-r from-stone-300 to-gray-300 text-gray-800 hover:scale-105 py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                form="unit-form"
+                className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:scale-105 text-white py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
+              >
+                {isEditing ? 'Guardar Cambios' : 'Crear Unidad'}
+              </Button>
             </div>
           </div>
-        </form>
+        </div>
       </div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-60 flex items-center justify-center">
           <div 
-            className="fixed inset-0 bg-black/60"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setShowDeleteConfirm(false)}
           />
-          <div className="relative bg-white rounded-xl shadow-2xl p-6 max-w-md mx-4 z-70">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-600" />
+          <div className="relative bg-gradient-to-br from-white to-red-50/30 rounded-3xl border-2 border-red-200 shadow-2xl p-8 max-w-md mx-4 z-70">
+            <div className="flex items-center gap-5 mb-6">
+              <div className="flex-shrink-0 w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-red-600 shadow-lg flex items-center justify-center">
+                <Trash2 className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Confirmar Eliminación</h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <h3 className="text-xl font-light tracking-wide text-red-950">Confirmar Eliminación</h3>
+                <p className="text-sm text-gray-700 mt-2 font-light">
                   ¿Estás seguro de que deseas eliminar esta unidad? Esta acción no se puede deshacer.
                 </p>
               </div>
             </div>
-            <div className="flex gap-3 mt-6">
+            <div className="flex gap-4 mt-8">
               <Button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 bg-stone-200 border border-stone-300 text-black hover:bg-stone-300 py-2.5 rounded-lg font-medium transition-colors"
+                className="flex-1 bg-gradient-to-r from-stone-300 to-gray-300 text-gray-800 hover:scale-105 py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
               >
                 Cancelar
               </Button>
               <Button
                 onClick={confirmDelete}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-lg font-medium transition-colors"
+                className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:scale-105 text-white py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
               >
                 Eliminar
               </Button>

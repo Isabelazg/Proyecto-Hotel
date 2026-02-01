@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/shared/components/ui/Button'
-import { Input } from '@/shared/components/ui/Input'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
 export function LoginForm({ onSubmit, isLoading }) {
@@ -18,52 +17,56 @@ export function LoginForm({ onSubmit, isLoading }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Email Field */}
-      <div className="space-y-2">
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+      <div className="space-y-3">
+        <label htmlFor="email" className="block text-sm font-semibold text-emerald-900 tracking-wide">
           Correo Electrónico
         </label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <Input
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Mail className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
             id="email"
             type="email"
             placeholder="tu@ejemplo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="pl-10 h-12"
+            className="w-full pl-12 pr-4 h-12 rounded-2xl border-2 border-emerald-200 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 focus:outline-none bg-white shadow-sm transition-all duration-300 text-gray-700 font-medium relative z-10"
             required
           />
         </div>
       </div>
 
       {/* Password Field */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label htmlFor="password" className="text-sm font-medium text-gray-700">
+          <label htmlFor="password" className="text-sm font-semibold text-emerald-900 tracking-wide">
             Contraseña
           </label>
           <Link
             to="/forgot-password"
-            className="text-sm text-amber-700 hover:text-amber-800 transition-colors font-medium"
+            className="text-sm text-emerald-600 hover:text-emerald-700 transition-colors font-medium tracking-wide"
           >
             ¿Olvidaste tu contraseña?
           </Link>
         </div>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <Input
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Lock className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
             id="password"
             type={showPassword ? 'text' : 'password'}
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="pl-10 pr-10 h-12"
+            className="w-full pl-12 pr-12 h-12 rounded-2xl border-2 border-emerald-200 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 focus:outline-none bg-white shadow-sm transition-all duration-300 text-gray-700 font-medium relative z-10"
             required
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors z-20"
           >
             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
           </button>
@@ -71,15 +74,15 @@ export function LoginForm({ onSubmit, isLoading }) {
       </div>
 
       {/* Remember Me */}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-3">
         <input
           id="remember"
           type="checkbox"
           checked={rememberMe}
           onChange={(e) => setRememberMe(e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300 text-amber-700 focus:ring-2 focus:ring-amber-600 focus:ring-offset-2"
+          className="h-4 w-4 rounded border-emerald-300 text-emerald-600 focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 cursor-pointer"
         />
-        <label htmlFor="remember" className="text-sm text-gray-600 cursor-pointer">
+        <label htmlFor="remember" className="text-sm text-gray-600 cursor-pointer font-medium tracking-wide">
           Mantener sesión iniciada
         </label>
       </div>
@@ -88,7 +91,7 @@ export function LoginForm({ onSubmit, isLoading }) {
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full h-12 bg-amber-900 hover:bg-amber-950 text-white font-medium transition-colors"
+        className="w-full h-12 bg-gradient-to-r from-emerald-600 to-green-600 hover:scale-105 text-white font-bold transition-all duration-300 shadow-xl shadow-emerald-900/20 rounded-full tracking-wide"
       >
         {isLoading ? (
           <span className="flex items-center justify-center gap-2">

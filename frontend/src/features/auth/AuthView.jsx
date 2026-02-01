@@ -8,21 +8,24 @@ export function AuthView() {
   return (
     <div className="flex h-screen">
       {/* Left Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-stone-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-stone-50 to-emerald-50">
         <div className="w-full max-w-md">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-serif font-bold text-gray-800 mb-3">
+          <div className="mb-10">
+            <div className="inline-block mb-4 px-4 py-1.5 bg-emerald-100/80 backdrop-blur-sm rounded-full border border-emerald-200/50">
+              <span className="text-emerald-700 font-medium tracking-wide text-sm">🏕️ Bienvenido de Vuelta</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-emerald-950 mb-4 tracking-tight">
               Bienvenido
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 font-light tracking-wide leading-relaxed">
               Ingresa a tu cuenta para acceder a tu experiencia de lujo
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
+            <div className="bg-red-50/80 backdrop-blur-sm border border-red-200 text-red-700 px-5 py-4 rounded-2xl mb-6 text-sm font-medium shadow-sm">
               {error}
             </div>
           )}
@@ -32,11 +35,11 @@ export function AuthView() {
 
           {/* Register Link */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 font-light tracking-wide">
               ¿No tienes una cuenta?{' '}
               <Link
                 to="/register"
-                className="text-amber-700 hover:text-amber-800 font-medium hover:underline"
+                className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors"
               >
                 Regístrate aquí
               </Link>
@@ -46,16 +49,16 @@ export function AuthView() {
           {/* Social Login Divider */}
           <div className="relative mt-8 mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-emerald-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-stone-50 text-gray-500">O CONTINUA CON</span>
+              <span className="px-4 bg-gradient-to-br from-stone-50 to-emerald-50 text-emerald-700 font-medium tracking-widest">O CONTINUA CON</span>
             </div>
           </div>
 
           {/* Social Login Buttons */}
           <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <button className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-emerald-200 rounded-2xl hover:bg-white hover:shadow-md hover:border-emerald-300 transition-all duration-300 bg-white/80 backdrop-blur-sm">
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -77,7 +80,7 @@ export function AuthView() {
               <span className="text-sm font-medium">Google</span>
             </button>
 
-            <button className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <button className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-emerald-200 rounded-2xl hover:bg-white hover:shadow-md hover:border-emerald-300 transition-all duration-300 bg-white/80 backdrop-blur-sm">
               <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
@@ -88,8 +91,8 @@ export function AuthView() {
       </div>
 
       {/* Right Side - Image */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-amber-900 to-amber-950">
-        <div className="absolute inset-0 bg-black/40"></div>
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-emerald-900 via-green-900 to-emerald-950">
+        <div className="absolute inset-0 bg-black/30"></div>
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -98,11 +101,11 @@ export function AuthView() {
         ></div>
         
         {/* Overlay Content */}
-        <div className="relative z-10 flex flex-col justify-end p-12 text-white">
-          <h2 className="text-5xl font-serif font-bold mb-4">
+        <div className="relative z-10 flex flex-col justify-end p-12 text-emerald-50">
+          <h2 className="text-5xl font-bold mb-6 tracking-tight leading-tight">
             Experiencia de<br />lujo redefinida
           </h2>
-          <p className="text-lg text-gray-200 mb-8">
+          <p className="text-xl text-emerald-100 mb-10 font-light tracking-wide leading-relaxed">
             Descubre el confort excepcional y el servicio<br />
             personalizado que mereces en cada estancia.
           </p>
@@ -111,12 +114,12 @@ export function AuthView() {
           <div className="flex items-center gap-4">
             <div className="flex gap-1">
               {[...Array(5)].map((_, i) => (
-                <svg key={i} className="w-5 h-5 text-amber-400 fill-current" viewBox="0 0 20 20">
+                <svg key={i} className="w-5 h-5 text-lime-400 fill-current" viewBox="0 0 20 20">
                   <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
                 </svg>
               ))}
             </div>
-            <p className="text-sm">Más de 10,000 huéspedes satisfechos</p>
+            <p className="text-sm font-light tracking-wide">Más de 10,000 huéspedes satisfechos</p>
           </div>
         </div>
       </div>

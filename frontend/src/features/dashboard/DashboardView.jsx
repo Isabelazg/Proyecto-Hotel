@@ -99,13 +99,13 @@ export function DashboardView() {
     switch (estado) {
       case 'en_ejecucion':
       case 'confirmada':
-        return 'bg-gray-900 text-white'
+        return 'bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg'
       case 'pendiente':
-        return 'bg-amber-100 text-amber-800'
+        return 'bg-gradient-to-r from-amber-400 to-yellow-400 text-amber-900 shadow-lg'
       case 'terminada':
-        return 'bg-green-100 text-green-800'
+        return 'bg-gradient-to-r from-lime-400 to-green-400 text-green-900 shadow-lg'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gradient-to-r from-stone-300 to-gray-300 text-gray-800 shadow-lg'
     }
   }
 
@@ -157,163 +157,169 @@ export function DashboardView() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+          <p className="mt-4 text-gray-700">Cargando dashboard...</p>
         </div>
       </div>
     )
   }
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-serif font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Vista general de las operaciones del hotel</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-emerald-50 to-lime-50 -m-6 p-6">
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-light tracking-wide text-emerald-950">Dashboard</h1>
+          <p className="text-gray-700 mt-2 font-light">Vista general de las operaciones del hotel</p>
+        </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Reservas de Hoy */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Reservas de Hoy</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.reservasHoy}</p>
-              <p className="text-xs text-gray-500 mt-2">Check-ins programados</p>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Reservas de Hoy */}
+          <div className="bg-gradient-to-br from-emerald-900 via-green-900 to-emerald-800 rounded-3xl shadow-xl shadow-black/20 p-6 backdrop-blur-lg border border-emerald-700/30 transition-all duration-300 hover:scale-105">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-emerald-200 tracking-wide">Reservas de Hoy</p>
+                <p className="text-4xl font-light text-white mt-3">{stats.reservasHoy}</p>
+                <p className="text-xs text-emerald-300 mt-3 font-light">Check-ins programados</p>
+              </div>
+              <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+                <Calendar className="h-6 w-6 text-lime-300" />
+              </div>
             </div>
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <Calendar className="h-5 w-5 text-blue-600" />
+          </div>
+
+          {/* Ingresos del Día */}
+          <div className="bg-gradient-to-br from-green-900 via-emerald-900 to-green-800 rounded-3xl shadow-xl shadow-black/20 p-6 backdrop-blur-lg border border-emerald-700/30 transition-all duration-300 hover:scale-105">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-emerald-200 tracking-wide">Ingresos Totales</p>
+                <p className="text-4xl font-light text-white mt-3">${stats.ingresosDia.toLocaleString()}</p>
+                <p className="text-xs text-emerald-300 mt-3 font-light">Pagos registrados</p>
+              </div>
+              <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+                <DollarSign className="h-6 w-6 text-lime-300" />
+              </div>
+            </div>
+          </div>
+
+          {/* Unidades Disponibles */}
+          <div className="bg-gradient-to-br from-emerald-800 via-green-900 to-emerald-900 rounded-3xl shadow-xl shadow-black/20 p-6 backdrop-blur-lg border border-emerald-700/30 transition-all duration-300 hover:scale-105">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-emerald-200 tracking-wide">Unidades Disponibles</p>
+                <p className="text-4xl font-light text-white mt-3">{stats.unidadesDisponibles}</p>
+                <p className="text-xs text-emerald-300 mt-3 font-light">de {stats.totalUnidades} unidades</p>
+              </div>
+              <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+                <Home className="h-6 w-6 text-lime-300" />
+              </div>
+            </div>
+          </div>
+
+          {/* Tasa de Ocupación */}
+          <div className="bg-gradient-to-br from-green-800 via-emerald-900 to-green-900 rounded-3xl shadow-xl shadow-black/20 p-6 backdrop-blur-lg border border-emerald-700/30 transition-all duration-300 hover:scale-105">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-medium text-emerald-200 tracking-wide">Tasa de Ocupación</p>
+                <p className="text-4xl font-light text-white mt-3">{stats.tasaOcupacion}%</p>
+                <p className="text-xs text-emerald-300 mt-3 font-light">{stats.totalUnidades - stats.unidadesDisponibles} ocupadas</p>
+              </div>
+              <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+                <TrendingUp className="h-6 w-6 text-lime-300" />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Ingresos del Día */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Ingresos Totales</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">${stats.ingresosDia.toLocaleString()}</p>
-              <p className="text-xs text-gray-500 mt-2">Pagos registrados</p>
+        {/* Reservas Lists */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Reservas de Hoy */}
+          <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl shadow-black/10 border-2 border-emerald-200/50 p-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-light tracking-wide text-emerald-950">Reservas de Hoy</h2>
+              <p className="text-sm text-gray-700 mt-2 font-light">{reservasHoy.length} check-ins programados</p>
             </div>
-            <div className="p-3 bg-green-50 rounded-lg">
-              <DollarSign className="h-5 w-5 text-green-600" />
-            </div>
-          </div>
-        </div>
 
-        {/* Unidades Disponibles */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Unidades Disponibles</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.unidadesDisponibles}</p>
-              <p className="text-xs text-gray-500 mt-2">de {stats.totalUnidades} unidades</p>
-            </div>
-            <div className="p-3 bg-purple-50 rounded-lg">
-              <Home className="h-5 w-5 text-purple-600" />
-            </div>
-          </div>
-        </div>
-
-        {/* Tasa de Ocupación */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Tasa de Ocupación</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.tasaOcupacion}%</p>
-              <p className="text-xs text-gray-500 mt-2">{stats.totalUnidades - stats.unidadesDisponibles} ocupadas</p>
-            </div>
-            <div className="p-3 bg-amber-50 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-amber-600" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Reservas Lists */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Reservas de Hoy */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="mb-6">
-            <h2 className="text-xl font-serif font-bold text-gray-900">Reservas de Hoy</h2>
-            <p className="text-sm text-gray-600 mt-1">{reservasHoy.length} check-ins programados</p>
-          </div>
-
-          {reservasHoy.length === 0 ? (
-            <div className="text-center py-8">
-              <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm">No hay reservas para hoy</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {reservasHoy.map(reserva => (
-                <div key={reserva.id} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-amber-900 text-white flex items-center justify-center font-medium text-sm">
-                      {getInitials(reserva.nombre_huesped, reserva.apellido_huesped)}
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {reserva.nombre_huesped} {reserva.apellido_huesped}
-                      </p>
-                      <p className="text-sm text-gray-500">{reserva.hospedaje?.nombre || 'Sin unidad'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1 text-gray-600">
-                      <Clock className="h-4 w-4" />
-                      <span className="text-sm">{formatTime(reserva.fecha_ingreso_hora)}</span>
-                    </div>
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(reserva.estado)}`}>
-                      {getStatusLabel(reserva.estado)}
-                    </span>
-                  </div>
+            {reservasHoy.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="inline-flex p-4 bg-emerald-50 rounded-3xl mb-4">
+                  <Calendar className="h-12 w-12 text-emerald-400" />
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Próximos Check-in */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="mb-6">
-            <h2 className="text-xl font-serif font-bold text-gray-900">Próximos Check-in</h2>
-            <p className="text-sm text-gray-600 mt-1">Reservas confirmadas próximos días</p>
+                <p className="text-gray-600 text-sm font-light">No hay reservas para hoy</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {reservasHoy.map(reserva => (
+                  <div key={reserva.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50/50 to-green-50/50 border-2 border-emerald-100 rounded-2xl hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-600 to-green-600 text-white flex items-center justify-center font-medium text-sm shadow-lg">
+                        {getInitials(reserva.nombre_huesped, reserva.apellido_huesped)}
+                      </div>
+                      <div>
+                        <p className="font-medium text-emerald-950">
+                          {reserva.nombre_huesped} {reserva.apellido_huesped}
+                        </p>
+                        <p className="text-sm text-gray-600 font-light">{reserva.hospedaje?.nombre || 'Sin unidad'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 text-emerald-700 bg-white/60 px-3 py-1.5 rounded-full">
+                        <Clock className="h-4 w-4" />
+                        <span className="text-sm font-medium">{formatTime(reserva.fecha_ingreso_hora)}</span>
+                      </div>
+                      <span className={`px-4 py-1.5 text-xs font-medium rounded-full ${getStatusColor(reserva.estado)}`}>
+                        {getStatusLabel(reserva.estado)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {proximosCheckins.length === 0 ? (
-            <div className="text-center py-8">
-              <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm">No hay reservas próximas</p>
+          {/* Próximos Check-in */}
+          <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl shadow-black/10 border-2 border-emerald-200/50 p-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-light tracking-wide text-emerald-950">Próximos Check-in</h2>
+              <p className="text-sm text-gray-700 mt-2 font-light">Reservas confirmadas próximos días</p>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {proximosCheckins.map(reserva => (
-                <div key={reserva.id} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-amber-800 text-white flex items-center justify-center font-medium text-sm">
-                      {getInitials(reserva.nombre_huesped, reserva.apellido_huesped)}
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {reserva.nombre_huesped} {reserva.apellido_huesped}
-                      </p>
-                      <p className="text-sm text-gray-500">{reserva.hospedaje?.nombre || 'Sin unidad'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1 text-gray-600">
-                      <Calendar className="h-4 w-4" />
-                      <span className="text-sm">{formatDate(reserva.fecha_ingreso_hora)}</span>
-                    </div>
-                    <span className="text-sm text-gray-600">
-                      {calculateNights(reserva.fecha_ingreso_hora, reserva.fecha_salida_hora)} {calculateNights(reserva.fecha_ingreso_hora, reserva.fecha_salida_hora) === 1 ? 'noche' : 'noches'}
-                    </span>
-                  </div>
+
+            {proximosCheckins.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="inline-flex p-4 bg-emerald-50 rounded-3xl mb-4">
+                  <Calendar className="h-12 w-12 text-emerald-400" />
                 </div>
-              ))}
-            </div>
-          )}
+                <p className="text-gray-600 text-sm font-light">No hay reservas próximas</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {proximosCheckins.map(reserva => (
+                  <div key={reserva.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50/50 to-green-50/50 border-2 border-emerald-100 rounded-2xl hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-600 to-emerald-600 text-white flex items-center justify-center font-medium text-sm shadow-lg">
+                        {getInitials(reserva.nombre_huesped, reserva.apellido_huesped)}
+                      </div>
+                      <div>
+                        <p className="font-medium text-emerald-950">
+                          {reserva.nombre_huesped} {reserva.apellido_huesped}
+                        </p>
+                        <p className="text-sm text-gray-600 font-light">{reserva.hospedaje?.nombre || 'Sin unidad'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 text-emerald-700 bg-white/60 px-3 py-1.5 rounded-full">
+                        <Calendar className="h-4 w-4" />
+                        <span className="text-sm font-medium">{formatDate(reserva.fecha_ingreso_hora)}</span>
+                      </div>
+                      <span className="text-sm text-gray-700 font-light bg-white/60 px-3 py-1.5 rounded-full">
+                        {calculateNights(reserva.fecha_ingreso_hora, reserva.fecha_salida_hora)} {calculateNights(reserva.fecha_ingreso_hora, reserva.fecha_salida_hora) === 1 ? 'noche' : 'noches'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

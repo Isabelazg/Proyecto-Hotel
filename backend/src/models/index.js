@@ -82,4 +82,16 @@ Usuario.hasMany(Pago, {
   as: 'pagos',
 });
 
+const db = {
+  sequelize,
+  Usuario,
+  Rol,
+  Permiso,
+  TipoHospedaje,
+  Hospedaje,
+  Reserva,
+  Pago
+};
+
+export default db;
 export { sequelize, Usuario, Rol, Permiso, TipoHospedaje, Hospedaje, Reserva, Pago };

@@ -3,6 +3,7 @@ import { X, Trash2 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
 import { Textarea } from '@/shared/components/ui/Textarea'
+import { CustomSelect } from '@/shared/components/ui/Select'
 import { getUnits } from '../../units/services/units.api'
 
 const STATUSES = [
@@ -292,22 +293,22 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
   const isEditing = !!reservation
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Overlay */}
       <div 
-        className="fixed inset-0 bg-black/50"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
       
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto">
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+      {/* Modal Container with proper containment */}
+      <div className="relative bg-gradient-to-br from-white to-emerald-50/30 rounded-3xl border-2 border-emerald-200 shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Header - Fixed */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-900 via-green-900 to-emerald-800 border-b-2 border-emerald-700 px-8 py-6 flex items-center justify-between rounded-t-3xl">
           <div>
-            <h2 className="text-2xl font-serif font-bold text-gray-900">
+            <h2 className="text-3xl font-light tracking-wide text-white">
               {isEditing ? 'Editar Reserva' : 'Nueva Reserva'}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-emerald-100 mt-2 font-light">
               {isEditing
                 ? 'Modifica los detalles de la reserva existente'
                 : 'Completa los detalles para crear una nueva reserva'}
@@ -315,17 +316,18 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2.5 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
           >
-            <X size={20} className="text-gray-600" />
+            <X size={22} className="text-white" />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {/* Form - Scrollable content */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <form id="reservation-form" onSubmit={handleSubmit} className="p-8 space-y-7">
           {/* Hospedaje y Estado */}
           <div>
-            <h3 className="text-base font-semibold text-gray-900 mb-3">Seleccionar Hospedaje</h3>
+            <h3 className="text-lg font-light tracking-wide text-emerald-950 mb-4">Seleccionar Hospedaje</h3>
             <div className="grid grid-cols-1 gap-4">
               {/* Hospedaje */}
               <div className="space-y-2">
@@ -337,42 +339,30 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
                 ) : errorHospedajes ? (
                   <div className="text-sm text-red-600 py-3">{errorHospedajes}</div>
                 ) : hospedajes.length === 0 ? (
-                  <div className="text-sm text-amber-600 py-3 bg-amber-50 border border-amber-200 rounded-lg px-4">
+                  <div className="text-sm text-amber-800 py-3 bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-300 rounded-2xl px-5 shadow-md">
                     No hay hospedajes disponibles. Por favor, cree un hospedaje primero.
                   </div>
                 ) : (
-                  <>
-                    {console.log('Renderizando select - formData.hospedaje_id:', formData.hospedaje_id, 'hospedajes:', hospedajes.length)}
-                    <select
-                      id="hospedaje_id"
-                      value={formData.hospedaje_id}
-                      onChange={(e) => {
-                        console.log('Cambio de hospedaje:', e.target.value)
-                        setFormData({ ...formData, hospedaje_id: e.target.value })
-                        // Limpiar error cuando se selecciona
-                        if (errors.hospedaje_id) {
-                          setErrors({ ...errors, hospedaje_id: undefined })
-                        }
-                      }}
-                      className={`w-full h-12 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent bg-white ${
-                        errors.hospedaje_id ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      required
-                    >
-                      <option value="">Selecciona un hospedaje</option>
-                      {hospedajes.map(hospedaje => {
-                        console.log('Option:', hospedaje.id, hospedaje.nombre, 'selected:', String(hospedaje.id) === String(formData.hospedaje_id))
-                        return (
-                          <option key={hospedaje.id} value={hospedaje.id}>
-                            {hospedaje.nombre} - ${hospedaje.precio}
-                          </option>
-                        )
-                      })}
-                    </select>
-                  </>
+                  <CustomSelect
+                    options={hospedajes.map(h => ({
+                      value: h.id,
+                      label: `${h.nombre} - $${h.precio}`
+                    }))}
+                    value={formData.hospedaje_id}
+                    onChange={(value) => {
+                      console.log('Cambio de hospedaje:', value)
+                      setFormData({ ...formData, hospedaje_id: value })
+                      if (errors.hospedaje_id) {
+                        setErrors({ ...errors, hospedaje_id: undefined })
+                      }
+                    }}
+                    placeholder="Selecciona un hospedaje"
+                    error={errors.hospedaje_id}
+                    required
+                  />
                 )}
                 {errors.hospedaje_id && (
-                  <p className="text-sm text-red-600 mt-1 bg-red-50 border border-red-200 rounded px-3 py-2">
+                  <p className="text-sm text-red-700 mt-1 bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-300 rounded-2xl px-4 py-3 shadow-md">
                     ⚠️ {errors.hospedaje_id}
                   </p>
                 )}
@@ -383,23 +373,19 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
                 <label htmlFor="estado" className="block text-sm font-medium text-gray-700">
                   Estado
                 </label>
-                <select
-                  id="estado"
+                <CustomSelect
+                  options={STATUSES}
                   value={formData.estado}
-                  onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-                  className="w-full h-12 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent bg-white"
-                >
-                  {STATUSES.map(status => (
-                    <option key={status.value} value={status.value}>{status.label}</option>
-                  ))}
-                </select>
+                  onChange={(value) => setFormData({ ...formData, estado: value })}
+                  placeholder="Selecciona el estado"
+                />
               </div>
             </div>
           </div>
 
           {/* Información del Huésped */}
-          <div className="border-t border-gray-200 pt-5">
-            <h3 className="text-base font-semibold text-gray-900 mb-3">Información del Huésped</h3>
+          <div className="border-t-2 border-emerald-200 pt-6">
+            <h3 className="text-lg font-light tracking-wide text-emerald-950 mb-4">Información del Huésped</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Nombre */}
@@ -506,8 +492,8 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
           </div>
 
           {/* Detalles de la Reserva */}
-          <div className="border-t border-gray-200 pt-5">
-            <h3 className="text-base font-semibold text-gray-900 mb-3">Detalles de la Reserva</h3>
+          <div className="border-t-2 border-emerald-200 pt-6">
+            <h3 className="text-lg font-light tracking-wide text-emerald-950 mb-4">Detalles de la Reserva</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Fecha Ingreso */}
@@ -605,38 +591,40 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
               )}
             </div>
           </div>
+          </form>
+        </div>
 
-          {/* Footer */}
-          <div className="sticky bottom-0 bg-white border-t border-stone-200 -mx-6 px-6 py-4">
-            <div className="flex gap-3">
-              {isEditing && (
-                <Button
-                  type="button"
-                  onClick={handleDelete}
-                  className="flex items-center gap-2 bg-red-900 hover:bg-red-950 text-white px-4 py-2.5 rounded-lg font-medium transition-colors"
-                >
-                  <Trash2 size={16} />
-                  Eliminar
-                </Button>
-              )}
-              <div className="flex-1 flex gap-3">
-                <Button
-                  type="button"
-                  onClick={onClose}
-                  className="flex-1 bg-stone-200 border border-stone-300 text-black hover:bg-stone-300 py-2.5 rounded-lg font-medium transition-colors"
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  className="flex-1 bg-black hover:bg-stone-900 text-white py-2.5 rounded-lg font-medium transition-colors"
-                >
-                  {isEditing ? 'Guardar Cambios' : 'Crear Reserva'}
-                </Button>
-              </div>
+        {/* Footer - Fixed */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-50 to-green-50 border-t-2 border-emerald-200 px-8 py-5 rounded-b-3xl">
+          <div className="flex gap-4">
+            {isEditing && (
+              <Button
+                type="button"
+                onClick={handleDelete}
+                className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:scale-105 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
+              >
+                <Trash2 size={18} />
+                Eliminar
+              </Button>
+            )}
+            <div className="flex-1 flex gap-4">
+              <Button
+                type="button"
+                onClick={onClose}
+                className="flex-1 bg-gradient-to-r from-stone-300 to-gray-300 text-gray-800 hover:scale-105 py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                form="reservation-form"
+                className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:scale-105 text-white py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
+              >
+                {isEditing ? 'Guardar Cambios' : 'Crear Reserva'}
+              </Button>
             </div>
           </div>
-        </form>
+        </div>
       </div>
 
       {/* Modal de confirmación de eliminación */}
@@ -644,41 +632,41 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
         <div className="fixed inset-0 z-[60] flex items-center justify-center">
           {/* Overlay */}
           <div 
-            className="fixed inset-0 bg-black/60"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setShowDeleteConfirm(false)}
           />
           
           {/* Modal */}
-          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6 z-10">
+          <div className="relative bg-gradient-to-br from-white to-red-50/30 rounded-3xl border-2 border-red-200 shadow-2xl w-full max-w-md mx-4 p-8 z-10">
             <div className="text-center">
               {/* Icono de advertencia */}
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                <Trash2 className="h-6 w-6 text-red-600" />
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-br from-red-500 to-red-600 shadow-lg mb-5">
+                <Trash2 className="h-8 w-8 text-white" />
               </div>
               
               {/* Título */}
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-2xl font-light tracking-wide text-red-950 mb-3">
                 ¿Eliminar reserva?
               </h3>
               
               {/* Descripción */}
-              <p className="text-sm text-gray-600 mb-6">
-                Esta acción no se puede deshacer. La reserva <span className="font-semibold">{reservation?.numero_reserva}</span> será eliminada permanentemente y el hospedaje quedará disponible.
+              <p className="text-sm text-gray-700 font-light mb-7">
+                Esta acción no se puede deshacer. La reserva <span className="font-medium text-emerald-900">{reservation?.numero_reserva}</span> será eliminada permanentemente y el hospedaje quedará disponible.
               </p>
               
               {/* Botones */}
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <Button
                   type="button"
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 bg-gray-200 border border-gray-300 text-gray-700 hover:bg-gray-300 py-2.5 rounded-lg font-medium transition-colors"
+                  className="flex-1 bg-gradient-to-r from-stone-300 to-gray-300 text-gray-800 hover:scale-105 py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="button"
                   onClick={confirmDelete}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-lg font-medium transition-colors"
+                  className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:scale-105 text-white py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
                 >
                   Eliminar
                 </Button>

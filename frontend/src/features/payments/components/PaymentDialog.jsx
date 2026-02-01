@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { X, Trash2 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/Button'
 import { Input } from '@/shared/components/ui/Input'
+import { CustomSelect } from '@/shared/components/ui/Select'
 import { getReservations } from '../../reservations/services/reservations.api'
 import { getClients } from '../../clients/services/clients.api'
 
@@ -131,22 +132,22 @@ export function PaymentDialog({ open, onClose, payment, onSave, onDelete }) {
   const isEditing = !!payment
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Overlay */}
       <div 
-        className="fixed inset-0 bg-black/50"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
       
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+      {/* Modal Container with proper containment */}
+      <div className="relative bg-gradient-to-br from-white to-emerald-50/30 rounded-3xl border-2 border-emerald-200 shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Header - Fixed */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-900 via-green-900 to-emerald-800 border-b-2 border-emerald-700 px-8 py-6 flex items-center justify-between rounded-t-3xl">
           <div>
-            <h2 className="text-2xl font-serif font-bold text-gray-900">
+            <h2 className="text-3xl font-light tracking-wide text-white">
               {isEditing ? 'Editar Pago' : 'Registrar Pago'}
             </h2>
-            <p className="text-sm text-stone-600 mt-1">
+            <p className="text-sm text-emerald-100 mt-2 font-light">
               {isEditing
                 ? 'Modifica los detalles del pago'
                 : 'Completa los detalles para registrar un nuevo pago'}
@@ -154,21 +155,22 @@ export function PaymentDialog({ open, onClose, payment, onSave, onDelete }) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-stone-100 rounded-lg transition-colors"
+            className="p-2.5 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
           >
-            <X size={20} className="text-stone-600" />
+            <X size={22} className="text-white" />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        {/* Form - Scrollable content */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <form id="payment-form" onSubmit={handleSubmit} className="p-8 space-y-6">
           {/* Error General */}
           {generalError && (
-            <div className="bg-red-50 border-2 border-red-500 rounded-lg px-4 py-3 flex items-start gap-3">
-              <div className="flex-shrink-0 text-red-600 text-xl">⚠️</div>
+            <div className="bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-400 rounded-2xl px-5 py-4 flex items-start gap-4 shadow-lg">
+              <div className="flex-shrink-0 text-red-600 text-2xl">⚠️</div>
               <div className="flex-1">
-                <h4 className="font-semibold text-red-800 mb-1">Error de Validación</h4>
-                <p className="text-sm text-red-700">{generalError}</p>
+                <h4 className="font-medium tracking-wide text-red-900 mb-2">Error de Validación</h4>
+                <p className="text-sm text-red-800 font-light">{generalError}</p>
               </div>
             </div>
           )}
@@ -184,15 +186,17 @@ export function PaymentDialog({ open, onClose, payment, onSave, onDelete }) {
                 <label htmlFor="reserva_id" className="block text-sm font-medium text-gray-700">
                   Reserva
                 </label>
-                <select
-                  id="reserva_id"
+                <CustomSelect
+                  options={reservations.map(res => ({
+                    value: res.id,
+                    label: `${res.numero_reserva} - ${res.hospedaje?.nombre || 'Hospedaje'} ($${parseFloat(res.valor || 0).toLocaleString()})`
+                  }))}
                   value={formData.reserva_id}
-                  onChange={(e) => {
-                    const reservaId = e.target.value
-                    setFormData({ ...formData, reserva_id: reservaId })
+                  onChange={(value) => {
+                    setFormData({ ...formData, reserva_id: value })
                     
                     // Guardar la reserva seleccionada para validación
-                    const reserva = reservations.find(r => r.id === parseInt(reservaId))
+                    const reserva = reservations.find(r => r.id === parseInt(value))
                     setSelectedReservation(reserva || null)
                     
                     // Limpiar errores
@@ -200,25 +204,17 @@ export function PaymentDialog({ open, onClose, payment, onSave, onDelete }) {
                       setErrors({ ...errors, reserva_id: undefined })
                     }
                   }}
-                  className={`w-full h-12 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent ${
-                    errors.reserva_id ? 'border-red-500' : 'border-stone-300'
-                  }`}
-                >
-                  <option value="">Selecciona una reserva</option>
-                  {reservations.map(res => (
-                    <option key={res.id} value={res.id}>
-                      {res.numero_reserva} - {res.hospedaje?.nombre || 'Hospedaje'} (${parseFloat(res.valor || 0).toLocaleString()})
-                    </option>
-                  ))}
-                </select>
+                  placeholder="Selecciona una reserva"
+                  error={errors.reserva_id}
+                />
                 {errors.reserva_id && (
-                  <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded px-3 py-2">
+                  <p className="text-red-700 text-sm bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-300 rounded-2xl px-4 py-3 shadow-md">
                     ⚠️ {errors.reserva_id}
                   </p>
                 )}
                 {selectedReservation && selectedReservation.valor && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3">
-                    <p className="text-sm text-blue-800">
+                  <div className="bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-2xl px-5 py-3 shadow-md">
+                    <p className="text-sm text-emerald-900 font-medium">
                       <strong>Valor de la reserva:</strong> ${parseFloat(selectedReservation.valor).toLocaleString()}
                     </p>
                   </div>
@@ -230,19 +226,16 @@ export function PaymentDialog({ open, onClose, payment, onSave, onDelete }) {
                 <label htmlFor="usuario_id" className="block text-sm font-medium text-gray-700">
                   Usuario/Cliente
                 </label>
-                <select
-                  id="usuario_id"
+                <CustomSelect
+                  options={usuarios.map(user => ({
+                    value: user.id,
+                    label: `${user.nombre} ${user.apellido} - ${user.correo}`
+                  }))}
                   value={formData.usuario_id}
-                  onChange={(e) => setFormData({ ...formData, usuario_id: e.target.value })}
-                  className="w-full h-12 px-4 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent"
-                >
-                  <option value="">Selecciona un usuario</option>
-                  {usuarios.map(user => (
-                    <option key={user.id} value={user.id}>
-                      {user.nombre} {user.apellido} - {user.correo}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => setFormData({ ...formData, usuario_id: value })}
+                  placeholder="Selecciona un usuario"
+                  error={errors.usuario_id}
+                />
                 {errors.usuario_id && <p className="text-red-600 text-sm">{errors.usuario_id}</p>}
               </div>
 
@@ -264,23 +257,23 @@ export function PaymentDialog({ open, onClose, payment, onSave, onDelete }) {
                     }
                   }}
                   placeholder="0.00"
-                  className={`h-12 ${errors.valor ? 'border-red-500' : ''}`}
+                  className={`h-12 ${errors.valor ? 'border-red-400 bg-red-50/30' : ''}`}
                 />
                 {errors.valor && (
-                  <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded px-3 py-2">
+                  <p className="text-red-700 text-sm bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-300 rounded-2xl px-4 py-3 shadow-md">
                     ⚠️ {errors.valor}
                   </p>
                 )}
                 {selectedReservation && selectedReservation.valor && formData.valor && (
-                  <div className={`border rounded-lg px-4 py-3 ${
+                  <div className={`border-2 rounded-2xl px-5 py-3 shadow-md ${
                     parseFloat(formData.valor) <= parseFloat(selectedReservation.valor)
-                      ? 'bg-green-50 border-green-200'
-                      : 'bg-red-50 border-red-200'
+                      ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-300'
+                      : 'bg-gradient-to-r from-red-50 to-red-100/50 border-red-300'
                   }`}>
-                    <p className={`text-sm ${
+                    <p className={`text-sm font-medium ${
                       parseFloat(formData.valor) <= parseFloat(selectedReservation.valor)
-                        ? 'text-green-800'
-                        : 'text-red-800'
+                        ? 'text-emerald-900'
+                        : 'text-red-900'
                     }`}>
                       {parseFloat(formData.valor) <= parseFloat(selectedReservation.valor)
                         ? `✓ El pago es válido (${((parseFloat(formData.valor) / parseFloat(selectedReservation.valor)) * 100).toFixed(1)}% de la reserva)`
@@ -292,88 +285,90 @@ export function PaymentDialog({ open, onClose, payment, onSave, onDelete }) {
               </div>
             </div>
           )}
+          </form>
+        </div>
 
-          {/* Footer */}
-          <div className="sticky bottom-0 bg-white border-t border-stone-200 -mx-6 px-6 py-4">
-            <div className="flex gap-3">
-              {isEditing && (
-                <Button
-                  type="button"
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="flex items-center gap-2 bg-red-900 hover:bg-red-950 text-white px-4 py-2.5 rounded-lg font-medium transition-colors"
-                >
-                  <Trash2 size={16} />
-                  Eliminar
-                </Button>
-              )}
-              <div className="flex-1 flex gap-3">
-                <Button
-                  type="button"
-                  onClick={onClose}
-                  className="flex-1 bg-stone-200 border border-stone-300 text-black hover:bg-stone-300 py-2.5 rounded-lg font-medium transition-colors"
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  className="flex-1 bg-black hover:bg-stone-900 text-white py-2.5 rounded-lg font-medium transition-colors"
-                  disabled={isLoadingData}
-                >
-                  {isEditing ? 'Guardar Cambios' : 'Registrar Pago'}
-                </Button>
-              </div>
+        {/* Footer - Fixed */}
+        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-50 to-green-50 border-t-2 border-emerald-200 px-8 py-5 rounded-b-3xl">
+          <div className="flex gap-4">
+            {isEditing && (
+              <Button
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:scale-105 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
+              >
+                <Trash2 size={18} />
+                Eliminar
+              </Button>
+            )}
+            <div className="flex-1 flex gap-4">
+              <Button
+                type="button"
+                onClick={onClose}
+                className="flex-1 bg-gradient-to-r from-stone-300 to-gray-300 text-gray-800 hover:scale-105 py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                form="payment-form"
+                className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:scale-105 text-white py-3 rounded-full font-medium transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                disabled={isLoadingData}
+              >
+                {isEditing ? 'Guardar Cambios' : 'Registrar Pago'}
+              </Button>
             </div>
           </div>
-        </form>
+        </div>
       </div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center">
           <div 
-            className="fixed inset-0 bg-black/70"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setShowDeleteConfirm(false)}
           />
-          <div className="relative bg-white rounded-xl shadow-2xl p-6 max-w-md mx-4 z-[70]">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-600" />
+          <div className="relative bg-gradient-to-br from-white to-red-50/30 rounded-3xl border-2 border-red-200 shadow-2xl p-8 max-w-md mx-4 z-[70]">
+            <div className="flex items-start gap-5 mb-6">
+              <div className="flex-shrink-0 w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-red-600 shadow-lg flex items-center justify-center">
+                <Trash2 className="w-7 h-7 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900">Confirmar Eliminación</h3>
-                <p className="text-sm text-gray-600 mt-2">
+                <h3 className="text-xl font-light tracking-wide text-red-950">Confirmar Eliminación</h3>
+                <p className="text-sm text-gray-700 mt-2 font-light">
                   ¿Estás seguro de que deseas eliminar este pago?
                 </p>
                 {payment && (
-                  <div className="mt-3 bg-gray-50 rounded-lg p-3 border border-gray-200">
-                    <p className="text-xs text-gray-500 mb-1">Detalles del pago:</p>
-                    <p className="text-sm font-medium text-gray-900">
-                      Valor: <span className="text-green-600">${parseFloat(payment.valor || 0).toLocaleString()}</span>
+                  <div className="mt-4 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-4 border-2 border-emerald-200 shadow-md">
+                    <p className="text-xs text-emerald-700 mb-2 font-medium">Detalles del pago:</p>
+                    <p className="text-sm font-medium text-emerald-950">
+                      Valor: <span className="text-green-700">${parseFloat(payment.valor || 0).toLocaleString()}</span>
                     </p>
                     {payment.reserva && (
-                      <p className="text-xs text-gray-600 mt-1">
+                      <p className="text-xs text-gray-700 mt-2">
                         Reserva: {payment.reserva.numero_reserva}
                       </p>
                     )}
                   </div>
                 )}
-                <p className="text-xs text-red-600 mt-3 font-medium">
+                <p className="text-xs text-red-700 mt-4 font-medium bg-red-50 border border-red-200 rounded-xl px-3 py-2">
                   ⚠️ Esta acción no se puede deshacer.
                 </p>
               </div>
             </div>
-            <div className="flex gap-3 mt-6">
+            <div className="flex gap-4 mt-8">
               <Button
                 type="button"
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 bg-stone-200 border border-stone-300 text-black hover:bg-stone-300 py-2.5 rounded-lg font-medium transition-colors"
+                className="flex-1 bg-gradient-to-r from-stone-300 to-gray-300 text-gray-800 hover:scale-105 py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
               >
                 Cancelar
               </Button>
               <Button
                 type="button"
                 onClick={confirmDelete}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-lg font-medium transition-colors"
+                className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:scale-105 text-white py-3 rounded-full font-medium transition-all duration-300 shadow-lg"
               >
                 Sí, Eliminar
               </Button>

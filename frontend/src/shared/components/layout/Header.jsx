@@ -31,40 +31,40 @@ export default function Header({ toggleSidebar, sidebarOpen }) {
   }
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-      <div className="flex items-center gap-4">
+    <header className="h-16 bg-gradient-to-r from-emerald-900 via-green-900 to-emerald-800 border-b-2 border-emerald-700 flex items-start justify-between px-6 shadow-lg shadow-black/20">
+      <div className="flex items-center gap-4 pt-3">
         <button
           onClick={toggleSidebar}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2.5 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
           title={sidebarOpen ? 'Ocultar menú' : 'Mostrar menú'}
         >
-          <Menu size={20} className="text-gray-600" />
+          <Menu size={22} className="text-white" />
         </button>
-        <div>
-          <h2 className="text-lg font-serif font-bold text-gray-900">
+        <div className="space-y-0">
+          <h2 className="text-lg font-light tracking-wide text-white leading-none">
             Panel de Administración
           </h2>
-          <p className="text-xs text-gray-500">Sistema de Gestión Hotelera</p>
+          <p className="text-xs text-emerald-100 font-light -mt-1">Sistema de Gestión Hotelera</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 pt-3">
         {/* Notifications */}
-        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
-          <Bell size={20} className="text-gray-600" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-amber-600"></span>
+        <button className="p-2.5 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110 relative">
+          <Bell size={22} className="text-white" />
+          <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-lime-400 shadow-lg shadow-lime-400/50"></span>
         </button>
 
         {/* User Menu */}
-        <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
-          <div className="w-8 h-8 rounded-full bg-amber-900 text-white flex items-center justify-center font-medium text-sm">
+        <div className="flex items-center gap-3 pl-4 border-l-2 border-emerald-700">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600 to-green-600 text-white flex items-center justify-center font-medium text-sm shadow-lg">
             {getUserInitials()}
           </div>
-          <div className="hidden md:block">
-            <p className="text-sm font-medium text-gray-900">
+          <div className="hidden md:block space-y-0">
+            <p className="text-sm font-medium text-white leading-none">
               {user ? `${user.nombre || ''} ${user.apellido || ''}`.trim() : 'Usuario'}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-emerald-100 font-light -mt-1">
               {user?.correo || 'usuario@hotel.com'}
             </p>
           </div>
@@ -72,10 +72,10 @@ export default function Header({ toggleSidebar, sidebarOpen }) {
 
         {/* Logout */}
         <button
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-amber-900 hover:bg-amber-50 rounded-lg transition-colors"
+          className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium bg-white/10 text-white hover:bg-white/20 hover:scale-105 rounded-full transition-all duration-300 shadow-lg"
           onClick={handleLogout}
         >
-          <LogOut size={16} />
+          <LogOut size={18} />
           <span className="hidden md:inline">Salir</span>
         </button>
       </div>
