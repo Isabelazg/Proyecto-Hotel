@@ -31,8 +31,8 @@ export default function Header({ toggleSidebar, sidebarOpen }) {
   }
 
   return (
-    <header className="h-16 bg-gradient-to-r from-emerald-900 via-green-900 to-emerald-800 border-b-2 border-emerald-700 flex items-start justify-between px-6 shadow-lg shadow-black/20">
-      <div className="flex items-center gap-4 pt-3">
+    <header className="h-16 bg-gradient-to-r from-emerald-900 via-green-900 to-emerald-800 border-b-2 border-emerald-700 flex items-center justify-between px-6 shadow-lg shadow-black/20">
+      <div className="flex items-center gap-4">
         <button
           onClick={toggleSidebar}
           className="p-2.5 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
@@ -40,15 +40,15 @@ export default function Header({ toggleSidebar, sidebarOpen }) {
         >
           <Menu size={22} className="text-white" />
         </button>
-        <div className="space-y-0">
-          <h2 className="text-lg font-light tracking-wide text-white leading-none">
+        <div className="flex flex-col justify-center mt-1">
+          <h2 className="text-lg font-semibold tracking-wide text-white leading-tight mb-0.5">
             Panel de Administración
           </h2>
-          <p className="text-xs text-emerald-100 font-light -mt-1">Sistema de Gestión Hotelera</p>
+          <p className="text-sm text-emerald-100/70 font-light leading-tight">Sistema de Gestión Hotelera</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-4 pt-3">
+      <div className="flex items-center gap-4">
         {/* Notifications */}
         <button className="p-2.5 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110 relative">
           <Bell size={22} className="text-white" />
@@ -60,11 +60,11 @@ export default function Header({ toggleSidebar, sidebarOpen }) {
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600 to-green-600 text-white flex items-center justify-center font-medium text-sm shadow-lg">
             {getUserInitials()}
           </div>
-          <div className="hidden md:block space-y-0">
-            <p className="text-sm font-medium text-white leading-none">
+          <div className="hidden md:flex flex-col justify-center mt-1">
+            <p className="text-sm font-medium text-white leading-tight mb-0.5">
               {user ? `${user.nombre || ''} ${user.apellido || ''}`.trim() : 'Usuario'}
             </p>
-            <p className="text-xs text-emerald-100 font-light -mt-1">
+            <p className="text-xs text-emerald-100/70 font-light leading-tight">
               {user?.correo || 'usuario@hotel.com'}
             </p>
           </div>

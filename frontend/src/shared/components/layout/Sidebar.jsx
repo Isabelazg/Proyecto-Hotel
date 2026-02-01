@@ -25,8 +25,8 @@ export default function Sidebar({ isOpen }) {
       }`}
     >
       {/* Logo */}
-      <div className="h-16 flex items-center px-6 border-b-2 border-emerald-800">
-        <h1 className="text-xl font-light tracking-wide text-white whitespace-nowrap">
+      <div className="h-16 flex items-center justify-center px-6 border-b-2 border-emerald-800">
+        <h1 className="text-xl font-semibold tracking-wide text-white whitespace-nowrap leading-tight">
           Hotel Elegance
         </h1>
       </div>
@@ -39,7 +39,7 @@ export default function Sidebar({ isOpen }) {
             to={path}
             end={path === '/admin'}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium whitespace-nowrap transition-all duration-300
+              `flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-medium whitespace-nowrap transition-all duration-300 leading-tight
               ${isActive
                 ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-lg shadow-emerald-900/50 scale-105'
                 : 'text-emerald-100 hover:bg-white/10 hover:text-white hover:scale-105'}`
