@@ -6,6 +6,7 @@ import TipoHospedaje from './tipoHospedaje.model.js';
 import Hospedaje from './hospedaje.model.js';
 import Reserva from './reserva.model.js';
 import Pago from './pago.model.js';
+import Notificacion from './notificacion.model.js';
 
 // Relación Usuario -> Rol (belongsTo)
 Usuario.belongsTo(Rol, {
@@ -82,6 +83,18 @@ Usuario.hasMany(Pago, {
   as: 'pagos',
 });
 
+// Relación Notificacion -> Usuario (belongsTo)
+Notificacion.belongsTo(Usuario, {
+  foreignKey: 'usuario_id',
+  as: 'usuario',
+});
+
+// Relación Usuario -> Notificacion (hasMany)
+Usuario.hasMany(Notificacion, {
+  foreignKey: 'usuario_id',
+  as: 'notificaciones',
+});
+
 const db = {
   sequelize,
   Usuario,
@@ -90,8 +103,9 @@ const db = {
   TipoHospedaje,
   Hospedaje,
   Reserva,
-  Pago
+  Pago,
+  Notificacion
 };
 
 export default db;
-export { sequelize, Usuario, Rol, Permiso, TipoHospedaje, Hospedaje, Reserva, Pago };
+export { sequelize, Usuario, Rol, Permiso, TipoHospedaje, Hospedaje, Reserva, Pago, Notificacion };

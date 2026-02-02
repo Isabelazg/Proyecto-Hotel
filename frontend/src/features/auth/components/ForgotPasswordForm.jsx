@@ -1,40 +1,72 @@
 import { useState } from 'react'
 import { Button } from '@/shared/components/ui/Button'
-import { Input } from '@/shared/components/ui/Input'
-import { Mail } from 'lucide-react'
+import { X } from 'lucide-react'
 
-export function ForgotPasswordForm({ onSubmit, isLoading }) {
+export function ForgotPasswordForm({ onSubmit, isLoading, error }) {
   const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
+
+  // Validar email en tiempo real
+  const isEmailValid = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    
+    // Validar email
+    if (!email) {
+      setEmailError('El correo electrónico es requerido')
+      return
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError('El correo electrónico no es válido')
+      return
+    }
+    
+    setEmailError('')
     onSubmit({ email })
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+      <div className="space-y-3">
+        <label htmlFor="email" className="block text-sm font-semibold text-emerald-900 tracking-wide">
           Correo Electrónico
         </label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <Input
+          <input
             id="email"
             type="email"
             placeholder="tu@ejemplo.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="pl-10 h-12"
+            onChange={(e) => {
+              setEmail(e.target.value)
+              setEmailError('')
+            }}
+            className={`w-full px-4 h-12 rounded-2xl border-2 ${
+              emailError || error ? 'border-red-300' : 'border-emerald-200'
+            } focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 focus:outline-none bg-white shadow-sm transition-all duration-300 text-gray-700 font-medium`}
             required
           />
         </div>
+        {/* Mostrar error de validación local */}
+        {emailError && (
+          <div className="flex items-start gap-2 text-sm text-red-600 mt-1">
+            <X className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span>{emailError}</span>
+          </div>
+        )}
+        {/* Mostrar error del servidor */}
+        {!emailError && error && (
+          <div className="flex items-start gap-2 text-sm text-red-600 mt-1">
+            <X className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
       </div>
 
       <Button
         type="submit"
-        disabled={isLoading}
-        className="w-full h-12 bg-amber-900 hover:bg-amber-950 text-white font-medium transition-colors"
+        disabled={isLoading || !isEmailValid}
+        className="w-full h-12 bg-gradient-to-r from-emerald-600 to-green-600 hover:scale-105 text-white font-bold transition-all duration-300 shadow-xl shadow-emerald-900/20 rounded-full tracking-wide disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
         {isLoading ? (
           <span className="flex items-center justify-center gap-2">

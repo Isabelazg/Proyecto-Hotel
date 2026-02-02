@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 // Admin Pages
 import LoginPage from '@/pages/LoginPage'
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage'
+import ResetPasswordPage from '@/pages/ResetPasswordPage'
 import DashboardPage from '@/pages/DashboardPage'
 import ReservationsPage from '@/pages/ReservationsPage'
 import UnitsPage from '@/pages/UnitsPage'
@@ -33,6 +34,8 @@ export default function AppRoutes() {
         {/* RUTAS DE AUTENTICACIÓN */}
         <Route path="/admin/login" element={<LoginPage />} />
         <Route path="/admin/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/admin/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* RUTAS PROTEGIDAS - PANEL ADMINISTRATIVO */}
         <Route element={<ProtectedRoute />}>

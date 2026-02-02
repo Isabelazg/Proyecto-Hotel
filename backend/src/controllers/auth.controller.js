@@ -28,10 +28,10 @@ export const login = async (req, res) => {
     });
 
     if (!usuario) {
-      return errorResponse(res, "Credenciales inválidas", 401, [
+      return errorResponse(res, "Correo no registrado", 401, [
         {
-          code: "INVALID_CREDENTIALS",
-          detail: "El correo o la contraseña son incorrectos.",
+          code: "EMAIL_NOT_FOUND",
+          detail: "El correo electrónico no está registrado en el sistema.",
         },
       ]);
     }
@@ -40,10 +40,10 @@ export const login = async (req, res) => {
     const esValida = await Usuario.comparePassword(contrasena, usuario.contrasena);
 
     if (!esValida) {
-      return errorResponse(res, "Credenciales inválidas", 401, [
+      return errorResponse(res, "Contraseña incorrecta", 401, [
         {
-          code: "INVALID_CREDENTIALS",
-          detail: "El correo o la contraseña son incorrectos.",
+          code: "INVALID_PASSWORD",
+          detail: "La contraseña ingresada no es correcta.",
         },
       ]);
     }

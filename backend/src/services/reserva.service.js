@@ -1,6 +1,7 @@
-import { Reserva, Hospedaje, TipoHospedaje } from '../models/index.js';
+import { Reserva, Hospedaje, TipoHospedaje, Usuario } from '../models/index.js';
 import { Op } from 'sequelize';
 import { buildPagination } from '../utils/buildPagination.util.js';
+import { createNotificationsForUsers } from './notificacion.service.js';
 
 /**
  * Genera un número de reserva único
@@ -234,6 +235,28 @@ export const createReservaService = async (data) => {
       ],
     });
 
+    // Crear notificación para todos los usuarios (admins)
+    try {
+      const usuarios = await Usuario.findAll({
+        attributes: ['id'],
+      });
+      
+      const usuariosIds = usuarios.map(u => u.id);
+      
+      if (usuariosIds.length > 0) {
+        await createNotificationsForUsers(usuariosIds, {
+          tipo: 'reserva_creada',
+          titulo: `Nueva Reserva: ${reserva.numero_reserva}`,
+          mensaje: `Se ha creado una nueva reserva para ${reserva.nombre_huesped} ${reserva.apellido_huesped} en ${reserva.hospedaje?.nombre || 'hospedaje'}`,
+          relacionado_id: reserva.id,
+          relacionado_tipo: 'reserva',
+        });
+      }
+    } catch (notifError) {
+      console.error('Error al crear notificaciones:', notifError);
+      // No lanzar error para no afectar la creación de la reserva
+    }
+
     return reserva;
   } catch (error) {
     throw new Error(`Error al crear reserva: ${error.message}`);
@@ -289,6 +312,27 @@ export const updateReservaService = async (id, data) => {
         if (data.estado === 'en_ejecucion') {
           // Pasar a en_ejecucion: bloquear hospedaje
           await hospedaje.update({ estado: false });
+          
+          // Crear notificación cuando la reserva inicia
+          try {
+            const usuarios = await Usuario.findAll({
+              attributes: ['id'],
+            });
+            
+            const usuariosIds = usuarios.map(u => u.id);
+            
+            if (usuariosIds.length > 0) {
+              await createNotificationsForUsers(usuariosIds, {
+                tipo: 'reserva_iniciada',
+                titulo: `Reserva Iniciada: ${reserva.numero_reserva}`,
+                mensaje: `La reserva de ${reserva.nombre_huesped} ${reserva.apellido_huesped} ha iniciado en ${hospedaje.nombre}`,
+                relacionado_id: reserva.id,
+                relacionado_tipo: 'reserva',
+              });
+            }
+          } catch (notifError) {
+            console.error('Error al crear notificaciones:', notifError);
+          }
         } else if (estadoAnterior === 'en_ejecucion' && (data.estado === 'terminada' || data.estado === 'pendiente')) {
           // Salir de en_ejecucion: liberar hospedaje
           await hospedaje.update({ estado: true });

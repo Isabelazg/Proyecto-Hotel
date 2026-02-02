@@ -156,12 +156,12 @@ export function ClientsView() {
                 className="w-full px-4 py-3 h-12 rounded-xl bg-emerald-50/50 border border-emerald-200/30 focus:bg-white focus:border-emerald-300 focus:ring-2 focus:ring-emerald-200/30 focus:outline-none transition-all duration-200 text-gray-700 placeholder:text-gray-400"
               />
             </div>
-            <div className="flex items-center gap-3">
-              <Filter className="text-emerald-700" size={18} />
+            <div>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="h-12 px-5 py-2 rounded-xl bg-emerald-50/50 border border-emerald-200/30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-200/30 focus:border-emerald-300 transition-all duration-200 font-light text-gray-700"
+                className="h-12 px-5 py-2 rounded-xl bg-emerald-50/50 border border-emerald-200/30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-200/30 focus:border-emerald-300 transition-all duration-200 font-light text-gray-700 appearance-none pr-10"
+                style={{ backgroundImage: 'none' }}
               >
                 <option value="all">Todos los estados</option>
                 <option value="activo">Activos</option>

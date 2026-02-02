@@ -8,6 +8,7 @@ import HospedajesRoutes from "./hospedajes.routes.js";
 import ReservasRoutes from "./reservas.routes.js";
 import PagosRoutes from "./pagos.routes.js";
 import PublicRoutes from "./public.routes.js";
+import NotificacionesRoutes from "./notificaciones.routes.js";
 
 const router = Router();
 
@@ -25,5 +26,6 @@ router.use("/auth/tipos-hospedaje", TiposHospedajeRoutes);
 router.use("/auth/hospedajes", HospedajesRoutes);
 router.use("/auth/reservas", ReservasRoutes);
 router.use("/auth/pagos", PagosRoutes);
+router.use("/auth/notificaciones", NotificacionesRoutes);
 
 export default router;

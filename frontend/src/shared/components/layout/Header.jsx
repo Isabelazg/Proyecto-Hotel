@@ -1,6 +1,7 @@
-import { LogOut, User, Menu, Bell } from 'lucide-react'
+import { LogOut, User, Menu } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { NotificationBell } from '@/shared/components/common/NotificationBell'
 
 export default function Header({ toggleSidebar, sidebarOpen }) {
   const navigate = useNavigate()
@@ -50,10 +51,7 @@ export default function Header({ toggleSidebar, sidebarOpen }) {
 
       <div className="flex items-center gap-4">
         {/* Notifications */}
-        <button className="p-2.5 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110 relative">
-          <Bell size={22} className="text-white" />
-          <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-lime-400 shadow-lg shadow-lime-400/50"></span>
-        </button>
+        <NotificationBell />
 
         {/* User Menu */}
         <div className="flex items-center gap-3 pl-4 border-l-2 border-emerald-700">

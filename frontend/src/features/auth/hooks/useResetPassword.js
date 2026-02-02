@@ -1,26 +1,26 @@
 import { useState } from 'react'
-import { requestPasswordReset } from '../services/auth.api'
+import { resetPassword } from '../services/auth.api'
 
-export function useForgotPassword() {
+export function useResetPassword() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
 
-  const sendResetEmail = async ({ email }) => {
+  const submitReset = async ({ token, password }) => {
     setIsLoading(true)
     setError(null)
     setSuccess(false)
 
     try {
-      await requestPasswordReset(email)
+      await resetPassword({ token, contrasena: password })
       setSuccess(true)
     } catch (err) {
       const serverMessage = err.response?.data?.message
-      setError(serverMessage || err.message || 'Error al enviar el correo de recuperación')
+      setError(serverMessage || err.message || 'Error al restablecer la contraseña')
     } finally {
       setIsLoading(false)
     }
   }
 
-  return { sendResetEmail, isLoading, error, success }
+  return { submitReset, isLoading, error, success }
 }

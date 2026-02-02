@@ -1,4 +1,6 @@
 export { AuthView } from './AuthView'
 export { ForgotPasswordView } from './ForgotPasswordView'
+export { ResetPasswordView } from './ResetPasswordView'
 export { useAuth } from './hooks/useAuth'
 export { useForgotPassword } from './hooks/useForgotPassword'
+export { useResetPassword } from './hooks/useResetPassword'

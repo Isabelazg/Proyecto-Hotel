@@ -39,13 +39,16 @@ export function useAuth() {
       
     } catch (err) {
       console.error('Error en login:', err)
+      console.error('Error response:', err.response)
       
       let errorMessage = 'Error al iniciar sesión'
       
       if (err.response) {
         // El servidor respondió con un error
+        console.log('Error data:', err.response.data)
         errorMessage = err.response.data?.message || 
                       err.response.data?.errors?.[0]?.detail ||
+                      err.response.data?.error ||
                       `Error del servidor: ${err.response.status}`
       } else if (err.request) {
         // La petición se hizo pero no hubo respuesta
@@ -55,6 +58,7 @@ export function useAuth() {
         errorMessage = err.message
       }
       
+      console.log('Error message set to:', errorMessage)
       setError(errorMessage)
     } finally {
       setIsLoading(false)
