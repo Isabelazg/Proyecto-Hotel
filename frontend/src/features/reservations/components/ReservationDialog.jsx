@@ -33,6 +33,8 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
   const [errorHospedajes, setErrorHospedajes] = useState(null)
   const [errors, setErrors] = useState({})
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [isValorManual, setIsValorManual] = useState(false)
+  const [lastAutoValor, setLastAutoValor] = useState(null)
 
   useEffect(() => {
     if (open) {
@@ -42,6 +44,8 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
 
   useEffect(() => {
     if (reservation) {
+      setIsValorManual(true)
+      setLastAutoValor(null)
       // Formatear las fechas para el input datetime-local
       const formatDateForInput = (dateString) => {
         if (!dateString) return ''
@@ -68,6 +72,8 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
         valor: reservation.valor || ''
       })
     } else if (selectedDate && !reservation) {
+      setIsValorManual(false)
+      setLastAutoValor(null)
       // Solo establecer fechas predeterminadas si NO hay reserva (nueva reserva)
       const dateStr = selectedDate.toISOString().slice(0, 10)
       // Calcular fecha de salida (día siguiente)
@@ -92,6 +98,41 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
       })
     }
   }, [reservation, selectedDate])
+
+  useEffect(() => {
+    if (!open) return
+    if (reservation) return
+
+    const selectedHospedaje = hospedajes.find(
+      (h) => String(h.id) === String(formData.hospedaje_id)
+    )
+    const precio = Number(selectedHospedaje?.precio)
+
+    if (!formData.fecha_ingreso_hora || !formData.fecha_salida_hora || !Number.isFinite(precio)) {
+      return
+    }
+
+    const fechaIngreso = new Date(formData.fecha_ingreso_hora)
+    const fechaSalida = new Date(formData.fecha_salida_hora)
+    const diffMs = fechaSalida - fechaIngreso
+
+    if (!Number.isFinite(diffMs) || diffMs <= 0) return
+
+    const dayMs = 1000 * 60 * 60 * 24
+    const dias = Math.max(1, Math.ceil(diffMs / dayMs))
+    const autoValor = precio * dias
+
+    setFormData((prev) => {
+      const shouldUpdate = !isValorManual || prev.valor === '' || Number(prev.valor) === lastAutoValor
+      if (!shouldUpdate) return prev
+      return {
+        ...prev,
+        valor: autoValor.toFixed(2)
+      }
+    })
+
+    setLastAutoValor(autoValor)
+  }, [open, reservation, hospedajes, formData.hospedaje_id, formData.fecha_ingreso_hora, formData.fecha_salida_hora, isValorManual, lastAutoValor])
 
   const loadHospedajes = async () => {
     setIsLoadingHospedajes(true)
@@ -351,6 +392,7 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
                     value={formData.hospedaje_id}
                     onChange={(value) => {
                       console.log('Cambio de hospedaje:', value)
+                      setIsValorManual(false)
                       setFormData({ ...formData, hospedaje_id: value })
                       if (errors.hospedaje_id) {
                         setErrors({ ...errors, hospedaje_id: undefined })
@@ -505,7 +547,10 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
                   id="fecha_ingreso_hora"
                   type="datetime-local"
                   value={formData.fecha_ingreso_hora}
-                  onChange={(e) => setFormData({ ...formData, fecha_ingreso_hora: e.target.value })}
+                  onChange={(e) => {
+                    setIsValorManual(false)
+                    setFormData({ ...formData, fecha_ingreso_hora: e.target.value })
+                  }}
                   className="h-12"
                   required
                 />
@@ -523,7 +568,10 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
                   id="fecha_salida_hora"
                   type="datetime-local"
                   value={formData.fecha_salida_hora}
-                  onChange={(e) => setFormData({ ...formData, fecha_salida_hora: e.target.value })}
+                  onChange={(e) => {
+                    setIsValorManual(false)
+                    setFormData({ ...formData, fecha_salida_hora: e.target.value })
+                  }}
                   className="h-12"
                   required
                 />
@@ -563,7 +611,10 @@ export function ReservationDialog({ open, onClose, reservation, selectedDate, on
                   min="0"
                   max="999999999"
                   value={formData.valor}
-                  onChange={(e) => setFormData({ ...formData, valor: e.target.value })}
+                  onChange={(e) => {
+                    setIsValorManual(true)
+                    setFormData({ ...formData, valor: e.target.value })
+                  }}
                   placeholder="0.00"
                   className="h-12"
                 />
