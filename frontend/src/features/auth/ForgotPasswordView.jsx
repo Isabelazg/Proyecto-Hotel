@@ -55,20 +55,21 @@ export function ForgotPasswordView() {
 
       {/* Right Side - Image */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-emerald-900 via-green-900 to-emerald-950">
-        <div className="absolute inset-0 bg-black/30"></div>
+        <div className="absolute inset-0 bg-black/60"></div>
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070)',
+            backgroundImage: 'url(https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=2070)',
           }}
         ></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80"></div>
         
         {/* Overlay Content */}
-        <div className="relative z-10 flex flex-col justify-end p-12 text-emerald-50">
-          <h2 className="text-5xl font-bold mb-6 tracking-tight leading-tight">
+        <div className="relative z-10 flex flex-col justify-end p-12 text-white">
+          <h2 className="text-5xl font-bold mb-6 tracking-tight leading-tight text-white">
             Tu seguridad<br />es nuestra prioridad
           </h2>
-          <p className="text-xl text-emerald-100 mb-10 font-light tracking-wide leading-relaxed">
+          <p className="text-xl text-white/90 mb-10 font-light tracking-wide leading-relaxed">
             Recupera el acceso a tu cuenta de forma<br />
             rápida y segura en pocos pasos.
           </p>

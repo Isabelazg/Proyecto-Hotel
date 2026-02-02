@@ -22,7 +22,7 @@ const Reserva = sequelize.define(
     },
     hospedaje_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
         model: 'hospedajes',
         key: 'id',
