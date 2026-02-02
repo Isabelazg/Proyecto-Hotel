@@ -23,15 +23,8 @@ export function AuthView() {
             </p>
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-50/80 backdrop-blur-sm border border-red-200 text-red-700 px-5 py-4 rounded-2xl mb-6 text-sm font-medium shadow-sm">
-              {error}
-            </div>
-          )}
-
           {/* Login Form */}
-          <LoginForm onSubmit={login} isLoading={isLoading} />
+          <LoginForm onSubmit={login} isLoading={isLoading} error={error} />
 
           {/* Register Link */}
           <div className="mt-6 text-center">

@@ -28,7 +28,7 @@ async function initDatabase() {
         nombre: 'Admin',
         apellido: 'Sistema',
         correo: 'admin@hotel.com',
-        contrasena: 'admin123', // Se hashea automáticamente
+        contrasena: 'Admin123.', // Se hashea automáticamente
         rol_id: adminRole.id
       }
     });

@@ -1,16 +1,68 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/shared/components/ui/Button'
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, Check, X } from 'lucide-react'
 
-export function LoginForm({ onSubmit, isLoading }) {
+export function LoginForm({ onSubmit, isLoading, error }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
+  const [touched, setTouched] = useState({ email: false, password: false })
+  const [emailError, setEmailError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [serverError, setServerError] = useState('')
+
+  // Actualizar error del servidor cuando cambia
+  useEffect(() => {
+    if (error) {
+      console.log('Error recibido en LoginForm:', error)
+      setServerError(error)
+    }
+  }, [error])
+
+  // Validaciones de contraseña
+  const passwordValidations = {
+    minLength: password.length >= 8,
+    hasUpperCase: /[A-Z]/.test(password),
+    hasLowerCase: /[a-z]/.test(password),
+    hasNumber: /\d/.test(password),
+    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+  }
+
+  const isPasswordValid = Object.values(passwordValidations).every(Boolean)
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    
+    let hasErrors = false
+    
+    // Validar email
+    if (!email) {
+      setEmailError('El correo electrónico es requerido')
+      hasErrors = true
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError('El correo electrónico no es válido')
+      hasErrors = true
+    } else {
+      setEmailError('')
+    }
+    
+    // Validar contraseña
+    if (!password) {
+      setPasswordError('La contraseña es requerida')
+      hasErrors = true
+    } else if (!isPasswordValid) {
+      setPasswordError('La contraseña no cumple con los requisitos de seguridad')
+      hasErrors = true
+    } else {
+      setPasswordError('')
+    }
+    
+    if (hasErrors) {
+      return
+    }
+    
     onSubmit({ email, password, rememberMe })
   }
 
@@ -30,11 +82,29 @@ export function LoginForm({ onSubmit, isLoading }) {
             type="email"
             placeholder="tu@ejemplo.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full pl-12 pr-4 h-12 rounded-2xl border-2 border-emerald-200 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 focus:outline-none bg-white shadow-sm transition-all duration-300 text-gray-700 font-medium relative z-10"
+            onChange={(e) => {
+              setEmail(e.target.value)
+              setEmailError('')
+              setServerError('')
+            }}
+            onBlur={() => setTouched({ ...touched, email: true })}
+            className={`w-full pl-12 pr-4 h-12 rounded-2xl border-2 ${(emailError || (serverError && (serverError.toLowerCase().includes('correo') || serverError.toLowerCase().includes('email')))) ? 'border-red-300' : 'border-emerald-200'} focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 focus:outline-none bg-white shadow-sm transition-all duration-300 text-gray-700 font-medium relative z-10`}
             required
           />
         </div>
+        {/* Mostrar error de email */}
+        {emailError && (
+          <div className="flex items-start gap-2 text-sm text-red-600 mt-1">
+            <X className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span>{emailError}</span>
+          </div>
+        )}
+        {!emailError && serverError && (serverError.toLowerCase().includes('correo') || serverError.toLowerCase().includes('email') || serverError.toLowerCase().includes('registrado')) && (
+          <div className="flex items-start gap-2 text-sm text-red-600 mt-1">
+            <X className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span>{serverError}</span>
+          </div>
+        )}
       </div>
 
       {/* Password Field */}
@@ -44,7 +114,7 @@ export function LoginForm({ onSubmit, isLoading }) {
             Contraseña
           </label>
           <Link
-            to="/forgot-password"
+            to="/admin/forgot-password"
             className="text-sm text-emerald-600 hover:text-emerald-700 transition-colors font-medium tracking-wide"
           >
             ¿Olvidaste tu contraseña?
@@ -59,8 +129,13 @@ export function LoginForm({ onSubmit, isLoading }) {
             type={showPassword ? 'text' : 'password'}
             placeholder="••••••••"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full pl-12 pr-12 h-12 rounded-2xl border-2 border-emerald-200 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 focus:outline-none bg-white shadow-sm transition-all duration-300 text-gray-700 font-medium relative z-10"
+            onChange={(e) => {
+              setPassword(e.target.value)
+              setPasswordError('')
+              setServerError('')
+            }}
+            onBlur={() => setTouched({ ...touched, password: true })}
+            className={`w-full pl-12 pr-12 h-12 rounded-2xl border-2 ${(passwordError || (serverError && (serverError.toLowerCase().includes('contraseña') || serverError.toLowerCase().includes('password') || serverError.toLowerCase().includes('incorrecta')))) ? 'border-red-300' : 'border-emerald-200'} focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 focus:outline-none bg-white shadow-sm transition-all duration-300 text-gray-700 font-medium relative z-10`}
             required
           />
           <button
@@ -71,6 +146,69 @@ export function LoginForm({ onSubmit, isLoading }) {
             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
           </button>
         </div>
+
+        {/* Error de contraseña */}
+        {passwordError && (
+          <div className="flex items-start gap-2 text-sm text-red-600 mt-1">
+            <X className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span>{passwordError}</span>
+          </div>
+        )}
+        {!passwordError && serverError && (serverError.toLowerCase().includes('contraseña') || serverError.toLowerCase().includes('password') || serverError.toLowerCase().includes('incorrecta')) && (
+          <div className="flex items-start gap-2 text-sm text-red-600 mt-1">
+            <X className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span>{serverError}</span>
+          </div>
+        )}
+
+        {/* Password Requirements */}
+        {touched.password && password && !isPasswordValid && (
+          <div className="mt-3 p-4 bg-red-50/50 rounded-xl border border-red-200/50 space-y-2">
+            <p className="text-xs font-semibold text-red-900 mb-2">La contraseña debe contener:</p>
+            <div className="space-y-1.5">
+              {!passwordValidations.minLength && (
+                <div className="flex items-center gap-2">
+                  <X className="w-4 h-4 text-red-500" />
+                  <span className="text-xs text-red-700">
+                    Mínimo 8 caracteres
+                  </span>
+                </div>
+              )}
+              {!passwordValidations.hasUpperCase && (
+                <div className="flex items-center gap-2">
+                  <X className="w-4 h-4 text-red-500" />
+                  <span className="text-xs text-red-700">
+                    Una letra mayúscula
+                  </span>
+                </div>
+              )}
+              {!passwordValidations.hasLowerCase && (
+                <div className="flex items-center gap-2">
+                  <X className="w-4 h-4 text-red-500" />
+                  <span className="text-xs text-red-700">
+                    Una letra minúscula
+                  </span>
+                </div>
+              )}
+              {!passwordValidations.hasNumber && (
+                <div className="flex items-center gap-2">
+                  <X className="w-4 h-4 text-red-500" />
+                  <span className="text-xs text-red-700">
+                    Un número
+                  </span>
+                </div>
+              )}
+              {!passwordValidations.hasSpecialChar && (
+                <div className="flex items-center gap-2">
+                  <X className="w-4 h-4 text-red-500" />
+                  <span className="text-xs text-red-700">
+                    Un carácter especial (!@#$%^&*...)
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Remember Me */}
@@ -90,8 +228,8 @@ export function LoginForm({ onSubmit, isLoading }) {
       {/* Submit Button */}
       <Button
         type="submit"
-        disabled={isLoading}
-        className="w-full h-12 bg-gradient-to-r from-emerald-600 to-green-600 hover:scale-105 text-white font-bold transition-all duration-300 shadow-xl shadow-emerald-900/20 rounded-full tracking-wide"
+        disabled={isLoading || !isPasswordValid}
+        className="w-full h-12 bg-gradient-to-r from-emerald-600 to-green-600 hover:scale-105 text-white font-bold transition-all duration-300 shadow-xl shadow-emerald-900/20 rounded-full tracking-wide disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
         {isLoading ? (
           <span className="flex items-center justify-center gap-2">
