@@ -50,6 +50,10 @@ export const showPago = async (req, res) => {
     return successResponse(res, {
       id: pago.id,
       valor: pago.valor,
+      reserva_id: pago.reserva_id,
+      usuario_id: pago.usuario_id,
+      reserva_id: pago.reserva_id,
+      usuario_id: pago.usuario_id,
       reserva: pago.reserva
         ? {
           id: pago.reserva.id,
@@ -118,6 +122,10 @@ export const updatePago = async (req, res) => {
     return successResponse(res, {
       id: pago.id,
       valor: pago.valor,
+      reserva_id: pago.reserva_id,
+      usuario_id: pago.usuario_id,
+      reserva_id: pago.reserva_id,
+      usuario_id: pago.usuario_id,
       reserva: pago.reserva
         ? {
           id: pago.reserva.id,

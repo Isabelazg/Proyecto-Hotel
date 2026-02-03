@@ -45,21 +45,28 @@ export function PaymentDialog({ open, onClose, payment, onSave, onDelete }) {
   useEffect(() => {
     if (payment) {
       setFormData({
-        reserva_id: payment.reserva_id || '',
-        usuario_id: payment.usuario_id || '',
+        reserva_id: String(payment.reserva?.id || payment.reserva_id || ''),
+        usuario_id: String(payment.usuario?.id || payment.usuario_id || ''),
         valor: payment.valor || ''
       })
+      // Si estamos editando y ya tenemos las reservas cargadas, buscar la reserva seleccionada
+      const reservaId = payment.reserva?.id || payment.reserva_id
+      if (reservations.length > 0 && reservaId) {
+        const reserva = reservations.find(r => r.id === parseInt(reservaId))
+        setSelectedReservation(reserva || null)
+      }
     } else {
       setFormData({
         reserva_id: '',
         usuario_id: '',
         valor: ''
       })
+      setSelectedReservation(null)
     }
     setErrors({})
     setGeneralError('')
     setShowDeleteConfirm(false)
-  }, [payment, open])
+  }, [payment, open, reservations])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -188,7 +195,7 @@ export function PaymentDialog({ open, onClose, payment, onSave, onDelete }) {
                 </label>
                 <CustomSelect
                   options={reservations.map(res => ({
-                    value: res.id,
+                    value: String(res.id),
                     label: `${res.numero_reserva} - ${res.hospedaje?.nombre || 'Hospedaje'} ($${parseFloat(res.valor || 0).toLocaleString()})`
                   }))}
                   value={formData.reserva_id}
@@ -228,7 +235,7 @@ export function PaymentDialog({ open, onClose, payment, onSave, onDelete }) {
                 </label>
                 <CustomSelect
                   options={usuarios.map(user => ({
-                    value: user.id,
+                    value: String(user.id),
                     label: `${user.nombre} ${user.apellido} - ${user.correo}`
                   }))}
                   value={formData.usuario_id}
